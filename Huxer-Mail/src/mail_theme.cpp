@@ -127,6 +127,7 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
 
   TextFieldStyle text_field = TextFieldStyle::Default();
   text_field.variant = TextFieldVariant::Outlined;
+  text_field.show_label = false;
   text_field.outlined.background = theme.colors.surface;
   text_field.outlined.border = theme.colors.outline;
   text_field.outlined.hovered_border = theme.colors.on_surface_variant;
