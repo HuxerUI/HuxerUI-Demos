@@ -1,0 +1,4 @@
+Huxer Mail offline attachment
+
+This deterministic document is bundled with the application and remains available without a network connection.
+It represents an original fictional team artifact created for the Huxer Mail demo.
