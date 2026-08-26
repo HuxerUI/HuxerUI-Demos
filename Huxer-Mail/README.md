@@ -47,7 +47,7 @@ huxerui build windows --profile debug
 huxerui run windows --profile debug
 ```
 
-Use `huxerui build <platform> --profile <profile>` with `windows`, `android`, `web`, `macos`, or `ios` and a `debug` or `release` profile. The repository contains the platform projects required by each target.
+Use `huxerui build <platform> --profile <profile>` with `windows`, `linux`, `android`, `web`, `macos`, or `ios` and a `debug` or `release` profile. The repository contains the platform projects required by each target.
 
 Web output is written to `.huxerui/build/web/<profile>` and must be served over HTTP with the correct JavaScript MIME for `.mjs` files and WebAssembly MIME for `.wasm` files. Use `huxerui devices android` to list Android targets and `huxerui open ios` to open the iOS project when platform tooling is available.
 

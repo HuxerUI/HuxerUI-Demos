@@ -355,7 +355,7 @@ Background state pauses nonessential motion and refresh presentation. Returning 
 
 ### Project boundary
 
-Huxer Mail is an independent HuxerUI project at repository root under `Huxer-Mail`, with Windows, Android, Web, macOS, and iOS platform directories compatible with the HuxerUI CLI project model.
+Huxer Mail is an independent HuxerUI project at repository root under `Huxer-Mail`, with Windows, Linux, Android, Web, macOS, and iOS platform directories compatible with the HuxerUI CLI project model.
 
 Sources remain flat and split only by real responsibilities such as entry point, model, mailbox state, mock service, Views, and Theme. There is no shared demo library or general demo framework.
 

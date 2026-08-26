@@ -37,6 +37,6 @@ In addition to primary screens, application-level demos should cover the loading
 
 [Huxer Mail](Huxer-Mail/README.md) is an offline-first personal productivity mail client. It implements mail browsing, search, conversation reading, composing and replying, attachments, drafts, archive and delete undo, Outbox retry, deterministic synchronization, responsive navigation, localization, themes, and accessibility semantics.
 
-Huxer Mail is self-contained under `Huxer-Mail` and includes Windows, Android, Web, macOS, and iOS platform projects. Every demo keeps an independent product and project boundary.
+Huxer Mail is self-contained under `Huxer-Mail` and includes Windows, Linux, Android, Web, macOS, and iOS platform projects. Every demo keeps an independent product and project boundary.
 
 See the [Demo design guide](docs/demo-planning.md) for the public SDK capability assessment, candidate coverage, and Huxer Mail architecture.
