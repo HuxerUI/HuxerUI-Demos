@@ -19,69 +19,63 @@ CheckboxStyle MailCheckboxStyle(const ThemeSpec& theme) {
   return checkbox;
 }
 
-ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
+ThemeDefinition MailThemeDefinition(ThemeMode mode) {
   ThemeSpec theme = mode == ThemeMode::Dark ? FlatDarkThemeSpec() : FlatLightThemeSpec();
   if (mode == ThemeMode::Dark) {
-    theme.colors.primary = Color::Rgb(157, 182, 225);
-    theme.colors.on_primary = Color::Rgb(32, 45, 75);
-    theme.colors.secondary = Color::Rgb(174, 183, 204);
-    theme.colors.on_secondary = Color::Rgb(38, 43, 55);
-    theme.colors.secondary_container = Color::Rgb(45, 58, 82);
-    theme.colors.on_secondary_container = Color::Rgb(224, 231, 244);
-    theme.colors.background = Color::Rgb(22, 24, 29);
-    theme.colors.surface = Color::Rgb(32, 35, 41);
-    theme.colors.surface_container_low = Color::Rgb(27, 30, 36);
-    theme.colors.surface_container = Color::Rgb(39, 43, 51);
-    theme.colors.surface_container_high = Color::Rgb(46, 51, 60);
-    theme.colors.surface_container_highest = Color::Rgb(57, 64, 75);
-    theme.colors.on_surface = Color::Rgb(242, 243, 246);
-    theme.colors.on_surface_variant = Color::Rgb(180, 186, 198);
-    theme.colors.outline = Color::Rgb(65, 72, 85);
-    theme.colors.inverse_surface = Color::Rgb(239, 241, 245);
-    theme.colors.inverse_on_surface = Color::Rgb(32, 35, 41);
-    theme.colors.error = Color::Rgb(234, 146, 155);
+    theme.colors.primary = Color::Rgb(164, 145, 255);
+    theme.colors.on_primary = Color::Rgb(29, 22, 64);
+    theme.colors.secondary = Color::Rgb(123, 156, 245);
+    theme.colors.on_secondary = Color::Rgb(19, 27, 53);
+    theme.colors.secondary_container = Color::Rgb(55, 47, 83);
+    theme.colors.on_secondary_container = Color::Rgb(237, 233, 255);
+    theme.colors.background = Color::Rgb(20, 18, 32);
+    theme.colors.surface = Color::Rgb(29, 26, 44);
+    theme.colors.surface_container_low = Color::Rgb(25, 23, 39);
+    theme.colors.surface_container = Color::Rgb(35, 31, 51);
+    theme.colors.surface_container_high = Color::Rgb(43, 39, 61);
+    theme.colors.surface_container_highest = Color::Rgb(56, 51, 76);
+    theme.colors.on_surface = Color::Rgb(247, 245, 252);
+    theme.colors.on_surface_variant = Color::Rgb(181, 176, 200);
+    theme.colors.outline = Color::Rgb(61, 56, 80);
+    theme.colors.inverse_surface = Color::Rgb(246, 244, 252);
+    theme.colors.inverse_on_surface = Color::Rgb(28, 25, 42);
+    theme.colors.error = Color::Rgb(247, 145, 162);
   } else {
-    theme.colors.primary = Color::Rgb(77, 112, 174);
+    theme.colors.primary = Color::Rgb(116, 87, 245);
     theme.colors.on_primary = Color::White();
-    theme.colors.secondary = Color::Rgb(104, 116, 143);
+    theme.colors.secondary = Color::Rgb(65, 105, 225);
     theme.colors.on_secondary = Color::White();
-    theme.colors.secondary_container = Color::Rgb(232, 237, 247);
-    theme.colors.on_secondary_container = Color::Rgb(48, 68, 108);
-    theme.colors.background = Color::Rgb(247, 248, 250);
+    theme.colors.secondary_container = Color::Rgb(247, 245, 255);
+    theme.colors.on_secondary_container = Color::Rgb(48, 38, 96);
+    theme.colors.background = Color::Rgb(240, 239, 250);
     theme.colors.surface = Color::White();
-    theme.colors.surface_container_low = Color::Rgb(250, 250, 251);
-    theme.colors.surface_container = Color::Rgb(243, 245, 248);
-    theme.colors.surface_container_high = Color::Rgb(235, 238, 243);
-    theme.colors.surface_container_highest = Color::Rgb(222, 226, 233);
-    theme.colors.on_surface = Color::Rgb(25, 29, 37);
-    theme.colors.on_surface_variant = Color::Rgb(101, 110, 126);
-    theme.colors.outline = Color::Rgb(218, 223, 231);
-    theme.colors.inverse_surface = Color::Rgb(30, 34, 43);
-    theme.colors.inverse_on_surface = Color::Rgb(247, 248, 250);
-    theme.colors.error = Color::Rgb(190, 82, 94);
+    theme.colors.surface_container_low = Color::Rgb(246, 245, 252);
+    theme.colors.surface_container = Color::Rgb(249, 249, 253);
+    theme.colors.surface_container_high = Color::Rgb(243, 241, 249);
+    theme.colors.surface_container_highest = Color::Rgb(230, 227, 240);
+    theme.colors.on_surface = Color::Rgb(23, 20, 38);
+    theme.colors.on_surface_variant = Color::Rgb(116, 113, 137);
+    theme.colors.outline = Color::Rgb(229, 227, 239);
+    theme.colors.inverse_surface = Color::Rgb(35, 31, 51);
+    theme.colors.inverse_on_surface = Color::Rgb(249, 248, 253);
+    theme.colors.error = Color::Rgb(201, 67, 91);
   }
   theme.typography.body_large = 16.0F;
   theme.typography.body_medium = 14.0F;
   theme.typography.body_small = 12.0F;
   theme.typography.label_large = 14.0F;
-  theme.typography.title_large = 20.0F;
-  theme.typography.headline_small = 28.0F;
-  theme.shapes.small = 10.0F;
-  theme.shapes.medium = 14.0F;
-  theme.shapes.large = 22.0F;
+  theme.typography.title_large = 21.0F;
+  theme.typography.headline_small = 30.0F;
+  theme.shapes.small = 8.0F;
+  theme.shapes.medium = 12.0F;
+  theme.shapes.large = 16.0F;
   theme.spacing.medium = 16.0F;
   theme.spacing.large = 24.0F;
-  theme.motion.reduced_motion = reduced_motion;
-  if (reduced_motion) {
-    theme.motion.fast = 0.01;
-    theme.motion.normal = 0.01;
-    theme.motion.slow = 0.01;
-  }
   theme.interactions.focus_ring = FocusRing{theme.colors.primary, 2.0F, 2.0F};
   const Color hover_fill =
-      mode == ThemeMode::Dark ? Color::Rgb(157, 182, 225, 0.09F) : Color::Rgb(77, 112, 174, 0.06F);
-  const Color press_fill = mode == ThemeMode::Dark ? Color::Rgb(157, 182, 225, 0.15F)
-                                                   : Color::Rgb(77, 112, 174, 0.11F);
+      mode == ThemeMode::Dark ? Color::Rgb(164, 145, 255, 0.10F) : Color::Rgb(116, 87, 245, 0.06F);
+  const Color press_fill = mode == ThemeMode::Dark ? Color::Rgb(164, 145, 255, 0.17F)
+                                                   : Color::Rgb(116, 87, 245, 0.11F);
   theme.interactions.indication = Indication{
       .focus = IndicationLayer{.fill = hover_fill},
       .hover = IndicationLayer{.fill = hover_fill},
@@ -95,17 +89,17 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   button.disabled_background = theme.colors.surface_container_high;
   button.disabled_label = theme.colors.on_surface_variant;
   button.padding = EdgeInsets::Symmetric(16.0F, 9.0F);
-  button.minimum_height = 40.0F;
-  button.corner_radii = CornerRadii{10.0F};
+  button.minimum_height = 38.0F;
+  button.corner_radii = CornerRadii{9.0F};
   definition.Set(button);
 
   IconButtonStyle icon_button = IconButtonStyle::Default();
   icon_button.foreground = theme.colors.on_surface_variant;
   icon_button.disabled_foreground = theme.colors.outline;
-  icon_button.icon_size = 19.0F;
-  icon_button.minimum_interactive_size = 40.0F;
-  icon_button.state_layer_size = 34.0F;
-  icon_button.corner_radius = 10.0F;
+  icon_button.icon_size = 18.0F;
+  icon_button.minimum_interactive_size = 38.0F;
+  icon_button.state_layer_size = 32.0F;
+  icon_button.corner_radius = 9.0F;
   definition.Set(icon_button);
 
   DividerStyle divider = DividerStyle::Default();
@@ -133,7 +127,7 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   text_field.outlined.hovered_border = theme.colors.on_surface_variant;
   text_field.outlined.focused_border = theme.colors.primary;
   text_field.outlined.disabled_border = theme.colors.surface_container_highest;
-  text_field.outlined.minimum_height = 44.0F;
+  text_field.outlined.minimum_height = 40.0F;
   text_field.text_style = TextStyle{Font::System(15.0F), theme.colors.on_surface};
   text_field.label_style =
       TextStyle{Font::System(13.0F).WithWeight(FontWeight::Medium), theme.colors.on_surface_variant};
@@ -149,8 +143,8 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
                                                  : Color::Rgb(77, 112, 174, 0.20F);
   text_field.caret = theme.colors.primary;
   text_field.composition = theme.colors.primary;
-  text_field.outlined.corner_radii = CornerRadii{12.0F};
-  text_field.padding = EdgeInsets::Symmetric(12.0F, 10.0F);
+  text_field.outlined.corner_radii = CornerRadii{10.0F};
+  text_field.padding = EdgeInsets::Symmetric(12.0F, 8.0F);
   text_field.validation_error = theme.colors.error;
   text_field.error_label = theme.colors.error;
   text_field.validation_text_style = TextStyle{Font::System(12.0F), theme.colors.error};
@@ -174,8 +168,8 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   TopAppBarStyle app_bar = TopAppBarStyle::Default();
   app_bar.background = theme.colors.surface;
   app_bar.title_style = TextStyle{Font::System(18.0F).WithWeight(FontWeight::SemiBold), theme.colors.on_surface};
-  app_bar.height = 58.0F;
-  app_bar.horizontal_padding = 12.0F;
+  app_bar.height = 60.0F;
+  app_bar.horizontal_padding = 8.0F;
   app_bar.title_inset = 12.0F;
   app_bar.action_spacing = 2.0F;
   definition.Set(app_bar);
@@ -185,13 +179,13 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   pane.selected_content = theme.colors.primary;
   pane.indicator = theme.colors.secondary_container;
   pane.label_style = TextStyle{Font::System(14.0F).WithWeight(FontWeight::Medium), theme.colors.on_surface_variant};
-  pane.compact_width = 76.0F;
-  pane.expanded_min_width = 232.0F;
+  pane.compact_width = 68.0F;
+  pane.expanded_min_width = 212.0F;
   pane.item_margin = EdgeInsets::Symmetric(4.0F, 2.0F);
   pane.item_padding = EdgeInsets::Symmetric(12.0F, 0.0F);
-  pane.item_height = 44.0F;
-  pane.icon_size = 20.0F;
-  pane.indicator_corner_radius = 12.0F;
+  pane.item_height = 46.0F;
+  pane.icon_size = 19.0F;
+  pane.indicator_corner_radius = 10.0F;
   definition.Set(pane);
 
   DrawerStyle drawer = DrawerStyle::Default();

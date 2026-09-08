@@ -144,7 +144,6 @@ enum class ThemeMode {
 enum class MailRouteKind {
   Reader,
   Composer,
-  Settings,
 };
 
 struct MailRoute {

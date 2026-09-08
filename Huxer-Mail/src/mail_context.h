@@ -51,6 +51,7 @@ struct NavigationContext {
 
 struct InteractionContext {
   State<TextEditingValue> search;
+  State<bool> search_open;
   State<bool> search_loading;
   State<std::vector<std::string>> search_results;
   State<bool> selection_mode;
@@ -77,7 +78,6 @@ struct InteractionContext {
 struct AppStatusContext {
   State<SyncStatus> sync;
   State<ThemeMode> theme;
-  State<bool> reduced_motion;
   State<ApplicationLifecycleState> lifecycle;
   State<int> clock_revision;
   std::shared_ptr<const void> identity;

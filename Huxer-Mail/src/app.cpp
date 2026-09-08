@@ -14,11 +14,11 @@ namespace {
 AppOptions BuildOptions() {
   AppOptions options;
   options.window.title = "Huxer Mail";
-  options.window.initial_size = {1180.0F, 720.0F};
+  options.window.initial_size = {1380.0F, 840.0F};
   options.window.content_mode = WindowContentMode::SafeArea;
   if constexpr (huxer_mail::kUsesDesktopWindowChrome) {
     options.window.chrome_mode = WindowChromeMode::Custom;
-    options.window.title_bar_height = 38.0F;
+    options.window.title_bar_height = 52.0F;
     options.window.caption_labels = WindowCaptionLabels{
         .minimize = app::strings::window_minimize,
         .toggle_maximize = app::strings::window_toggle_maximize,

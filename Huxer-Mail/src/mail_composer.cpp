@@ -29,6 +29,32 @@ ValidationResult ValidateRecipient(std::string_view recipient) {
   return Validate(recipient, Required(app::strings::recipient_required), EmailAddress(app::strings::recipient_invalid));
 }
 
+ThemeDefinition ComposerFieldTheme(const ThemeSpec& theme, float text_size, FontWeight weight) {
+  TextFieldStyle style = TextFieldStyle::Default();
+  style.variant = TextFieldVariant::Standard;
+  style.show_label = false;
+  style.standard.background = Color::Transparent();
+  style.standard.border = Color::Transparent();
+  style.standard.hovered_border = Color::Transparent();
+  style.standard.focused_border = Color::Transparent();
+  style.standard.disabled_border = theme.colors.outline;
+  style.standard.corner_radii = CornerRadii{};
+  style.standard.minimum_height = 48.0F;
+  style.text_style = TextStyle{Font::System(text_size).WithWeight(weight), theme.colors.on_surface};
+  style.label_style =
+      TextStyle{Font::System(12.0F).WithWeight(FontWeight::Medium), theme.colors.on_surface_variant};
+  style.floating_label_style = style.label_style;
+  style.placeholder_style = TextStyle{Font::System(text_size), theme.colors.on_surface_variant};
+  style.focused_label = theme.colors.primary;
+  style.selection = Color::Rgb(116, 87, 245, 0.20F);
+  style.caret = theme.colors.primary;
+  style.composition = theme.colors.primary;
+  style.padding = EdgeInsets::Symmetric(0.0F, 10.0F);
+  ThemeDefinition definition;
+  definition.Set(style);
+  return definition;
+}
+
 StringVariant AttachmentSize(std::uint64_t size) {
   constexpr std::uint64_t bytes_per_megabyte = 1024 * 1024;
   if (size >= bytes_per_megabyte) {
@@ -97,7 +123,7 @@ View ComposerView(bool compact) {
   const std::string send_label = UseString(app::strings::send);
   const std::string sending_label = UseString(app::strings::sending);
 
-  std::optional<View> leading = IconButton(app::images::close, app::strings::close).OnClick([=] {
+  View close_button = IconButton(app::images::close, app::strings::close).OnClick([=] {
     const ComposerDraft current = interaction.composer.Get();
     if (current.Empty()) {
       CloseComposer(navigation);
@@ -124,11 +150,6 @@ View ComposerView(bool compact) {
   });
 
   Views attachments;
-  if (draft.attachments.empty()) {
-    attachments.Add(
-        Text(app::strings::composer_no_attachments).Style({Font::System(13.0F), theme.colors.on_surface_variant})
-    );
-  }
   for (const MailAttachment& attachment : draft.attachments) {
     const StringVariant size = AttachmentSize(attachment.size);
     const bool megabytes = attachment.size >= 1024 * 1024;
@@ -145,13 +166,10 @@ View ComposerView(bool compact) {
     attachments.Add(
         Row{
             Image(app::images::attachment).Tint(theme.colors.primary).With(Frame{.width = 18.0F, .height = 18.0F}),
-            Column{
-                Text(attachment.name)
-                    .Style({Font::System(13.0F).WithWeight(FontWeight::Medium), theme.colors.on_surface}),
-                std::move(size_text),
-            }
-                .With(Spacing(2), Grow()),
-            IconButton(app::images::trash, app::strings::remove_attachment)
+            Text(attachment.name)
+                .Style({Font::System(13.0F).WithWeight(FontWeight::Medium), theme.colors.on_surface}),
+            std::move(size_text).With(Grow()),
+            IconButton(app::images::close, app::strings::remove_attachment)
                 .OnClick([interaction, id = attachment.id] {
                   interaction.composer.Update([&id](ComposerDraft& value) {
                     std::erase_if(value.attachments, [&id](const MailAttachment& item) { return item.id == id; });
@@ -161,10 +179,12 @@ View ComposerView(bool compact) {
         }
             .With(
                 Spacing(10),
-                Padding(EdgeInsets::Symmetric(12, 8)),
-                Background(theme.colors.surface_container_low),
+                Padding(EdgeInsets::Symmetric(12, 6)),
+                Background(theme.colors.surface_container),
+                Border{theme.colors.outline, 1.0F},
                 CornerRadius(theme.shapes.small),
                 CrossAlign(CrossAxisAlignment::Center),
+                Frame{.max_width = 420.0F},
                 Semantics{
                     .label = megabytes ? StringVariant::Format(
                                              app::strings::attachment_semantics_mb,
@@ -312,61 +332,90 @@ View ComposerView(bool compact) {
   });
 
   return Column{
-      TopAppBar(
-          draft.reply ? StringVariant(app::strings::composer_reply_title)
-                      : StringVariant(app::strings::composer_new_title),
-          std::move(leading)
-      ),
+      Row{
+          Column{
+              Text(draft.reply ? StringVariant(app::strings::composer_reply_title)
+                               : StringVariant(app::strings::composer_new_title))
+                  .Style({Font::System(20.0F).WithWeight(FontWeight::SemiBold), theme.colors.on_surface}),
+              Text(app::strings::composer_saved)
+                  .Style({Font::System(12.0F), theme.colors.on_surface_variant}),
+          }
+              .With(Spacing(3), Grow()),
+          std::move(close_button),
+      }
+          .With(
+              Padding(EdgeInsets::Symmetric(compact ? 18.0F : 28.0F, 14.0F)),
+              CrossAlign(CrossAxisAlignment::Center),
+              Frame{.height = compact ? 64.0F : 78.0F}
+          ),
+      Divider(),
       ScrollView{
           Column{
-              std::move(recipient),
-              std::move(subject),
-              std::move(body),
               Row{
-                  Text(app::strings::composer_attachments, TextRole::Title)
-                      .Style({Font::System(16.0F).WithWeight(FontWeight::SemiBold), theme.colors.on_surface})
-                      .With(Grow()),
-                  Row{std::move(attachment_controls)}.With(Spacing(10), CrossAlign(CrossAxisAlignment::Center)),
+                  Text(app::strings::recipient_label)
+                      .Style({Font::System(13.0F).WithWeight(FontWeight::Medium),
+                              theme.colors.on_surface_variant})
+                      .With(Frame{.width = 74.0F}),
+                  Column{
+                      Theme(ComposerFieldTheme(theme, 15.0F, FontWeight::Regular), std::move(recipient)),
+                  }
+                      .With(Grow(), CrossAlign(CrossAxisAlignment::Stretch)),
               }
-                  .With(CrossAlign(CrossAxisAlignment::Center)),
-              Column{std::move(attachments)}.With(Spacing(8), CrossAlign(CrossAxisAlignment::Stretch)),
+                  .With(CrossAlign(CrossAxisAlignment::Center), Frame{.min_height = 58.0F}),
+              Divider(),
               Row{
-                  Spacer(),
-                  std::move(send_button),
-              },
-              Text(interaction.live_announcement.Get())
-                  .Style({Font::System(12.0F), theme.colors.on_surface_variant})
-                  .With(
-                      Semantics{
-                          .busy = sending,
-                          .live_region = SemanticLiveRegion::Polite,
-                      }
-                  ),
+                  Text(app::strings::subject_label)
+                      .Style({Font::System(13.0F).WithWeight(FontWeight::Medium),
+                              theme.colors.on_surface_variant})
+                      .With(Frame{.width = 74.0F}),
+                  Column{
+                      Theme(ComposerFieldTheme(theme, 18.0F, FontWeight::SemiBold), std::move(subject)),
+                  }
+                      .With(Grow(), CrossAlign(CrossAxisAlignment::Stretch)),
+              }
+                  .With(CrossAlign(CrossAxisAlignment::Center), Frame{.min_height = 58.0F}),
+              Divider(),
+              Theme(ComposerFieldTheme(theme, 16.0F, FontWeight::Regular), std::move(body)),
+              Spacer().With(Frame{.height = compact ? 8.0F : 20.0F}),
+              Column{std::move(attachments)}.With(Spacing(8), CrossAlign(CrossAxisAlignment::Stretch)),
           }
               .With(
-                  Frame{.max_width = 840.0F},
-                  Spacing(20),
-                  Padding(compact ? EdgeInsets::All(20) : EdgeInsets::All(38)),
-                  Background(theme.colors.surface),
-                  CornerRadius(compact ? 0.0F : theme.shapes.large),
-                  Shadow(Color::Rgb(0, 0, 0, compact ? 0.0F : 0.055F), {0, 0}, compact ? 0.0F : 36.0F, 0),
+                  Frame{.max_width = 820.0F},
+                  Spacing(0),
+                  Padding(compact ? EdgeInsets::All(18) : EdgeInsets{22, 34, 26, 34}),
                   Align(HorizontalAlignment::Center, VerticalAlignment::Start),
                   CrossAlign(CrossAxisAlignment::Stretch)
               ),
       }
+          .With(ScrollBar(), Background(theme.colors.surface), Grow()),
+      Divider(),
+      Row{
+          std::move(send_button).With(Frame{.width = 96.0F, .height = 40.0F}),
+          Row{std::move(attachment_controls)}.With(Spacing(8), CrossAlign(CrossAxisAlignment::Center)),
+          Text(interaction.live_announcement.Get())
+              .Style({Font::System(12.0F), theme.colors.on_surface_variant})
+              .With(
+                  Grow(),
+                  Semantics{
+                      .busy = sending,
+                      .live_region = SemanticLiveRegion::Polite,
+                  }
+              ),
+      }
           .With(
-              ScrollBar(),
-              Padding(compact ? EdgeInsets{} : EdgeInsets::All(26)),
-              Background(theme.colors.background),
-              Grow()
+              Spacing(12),
+              Padding(EdgeInsets::Symmetric(compact ? 18.0F : 28.0F, 12.0F)),
+              CrossAlign(CrossAxisAlignment::Center),
+              Background(theme.colors.surface_container),
+              Frame{.height = compact ? 62.0F : 68.0F}
           ),
   }
       .With(
-          Background(theme.colors.background),
+          Background(theme.colors.surface),
           Grow(),
           Transition{AnimateTo(entered.Get() ? 1.0F : 0.0F, TweenSpec{theme.motion.normal, Easing::EaseOut})}
               .Opacity(0.0F, 1.0F)
-              .Offset({0.0F, theme.motion.reduced_motion ? 0.0F : 14.0F}, {})
+              .Offset({0.0F, theme.motion.reduced_motion ? 0.0F : 8.0F}, {})
       );
 }
 

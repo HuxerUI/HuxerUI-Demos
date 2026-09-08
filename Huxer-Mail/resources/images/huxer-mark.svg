@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none">
+  <defs>
+    <linearGradient id="aurora" x1="5" y1="4" x2="27" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38D6E8"/>
+      <stop offset="0.45" stop-color="#7457F5"/>
+      <stop offset="1" stop-color="#4169E1"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="5" width="7" height="22" rx="3.5" fill="url(#aurora)"/>
+  <rect x="21" y="5" width="7" height="22" rx="3.5" fill="url(#aurora)"/>
+  <path d="M10 12.5C12.8 10.1 15.7 10.1 18.4 12.5L22 15.7L18.4 19C15.7 21.4 12.8 21.4 10 19L7 15.7L10 12.5Z" fill="url(#aurora)"/>
+</svg>

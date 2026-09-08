@@ -12,14 +12,14 @@ Huxer Mail is a fully offline personal productivity mail client that uses a comp
 - Archive, delete, read, unread, star, timed undo, and permanent deletion confirmation in Trash.
 - An Outbox failure reason, editing, deterministic retry, and a polite live region.
 - A deterministic first manual refresh failure, successful retry with a new system update, and direct success on later refreshes.
-- Light and dark themes plus reduced motion, all scoped to the current session.
+- Light and dark themes with a one-click navigation toggle, scoped to the current session.
 
 ## Responsive structure
 
 - Expanded: expanded navigation, mail list, and Reader or Composer in three columns.
-- Medium: compact icon navigation with a two-column mail list and Reader; Composer or Settings replaces the main content region.
-- Compact: `TopAppBar`, Drawer, and mail list; Reader, Composer, and Settings open as pages in a typed `NavigationStack`.
-- Compact Web uses `BrowserNavigationStack` to synchronize `#/thread/...`, `#/compose`, and `#/settings` history.
+- Medium: compact icon navigation with a two-column mail list and Reader; Composer replaces the main content region.
+- Compact: `TopAppBar`, Drawer, and mail list; Reader and Composer open as pages in a typed `NavigationStack`.
+- Compact Web uses `BrowserNavigationStack` to synchronize `#/thread/...` and `#/compose` history.
 
 ## HuxerUI capabilities
 

@@ -33,6 +33,7 @@ View HuxerMailApp() {
   };
   const InteractionContext interaction{
       .search = UseState(TextEditingValue::FromText({})),
+      .search_open = UseState(false),
       .search_loading = UseState(false),
       .search_results = UseState(std::vector<std::string>{}),
       .selection_mode = UseState(false),
@@ -50,7 +51,6 @@ View HuxerMailApp() {
   const AppStatusContext status{
       .sync = UseState(SyncStatus{.phase = SyncPhase::Syncing}),
       .theme = UseState(ThemeMode::Light),
-      .reduced_motion = UseState(false),
       .lifecycle = UseState(ApplicationLifecycleState::Active),
       .clock_revision = UseState(0),
       .identity = context_identity,
@@ -83,7 +83,7 @@ View HuxerMailApp() {
   Environment environment;
   environment.Set(data).Set(navigation).Set(interaction).Set(status).Set(tasks);
   return Theme(
-      MailThemeDefinition(status.theme.Get(), status.reduced_motion.Get()),
+      MailThemeDefinition(status.theme.Get()),
       ProvideEnvironment(std::move(environment), MailboxRoot())
   );
 }

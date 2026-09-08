@@ -582,9 +582,6 @@ View ReaderView(std::string thread_id, bool compact) {
                   Frame{.max_width = 840.0F},
                   Spacing(20),
                   Padding(compact ? EdgeInsets::All(20) : EdgeInsets::All(32)),
-                  Background(theme.colors.surface),
-                  CornerRadius(compact ? 0.0F : theme.shapes.large),
-                  Shadow(Color::Rgb(0, 0, 0, compact ? 0.0F : 0.055F), {0, 0}, compact ? 0.0F : 36.0F, 0),
                   Align(HorizontalAlignment::Center, VerticalAlignment::Start),
                   CrossAlign(CrossAxisAlignment::Stretch),
                   Semantics{
@@ -594,13 +591,12 @@ View ReaderView(std::string thread_id, bool compact) {
       }
           .With(
               ScrollBar(),
-              Padding(compact ? EdgeInsets{} : EdgeInsets::All(26)),
-              Background(theme.colors.background),
+              Background(theme.colors.surface),
               Grow()
           ),
   }
       .With(
-          Background(theme.colors.background),
+          Background(theme.colors.surface),
           Grow(),
           Transition{AnimateTo(entered.Get() ? 1.0F : 0.0F, TweenSpec{theme.motion.fast, Easing::EaseOut})}
               .Opacity(0.0F, 1.0F)
