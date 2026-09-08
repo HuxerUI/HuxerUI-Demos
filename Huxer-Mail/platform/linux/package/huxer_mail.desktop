@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Huxer-Mail
+Exec=huxer_mail
+Icon=huxer_mail
+Categories=Utility;
+Terminal=false

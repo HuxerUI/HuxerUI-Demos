@@ -11,11 +11,11 @@ CheckboxStyle MailCheckboxStyle(const ThemeSpec& theme) {
   CheckboxStyle checkbox = CheckboxStyle::Default();
   checkbox.checked_background = theme.colors.primary;
   checkbox.checkmark = theme.colors.on_primary;
-  checkbox.unchecked_border = theme.colors.on_surface_variant;
+  checkbox.unchecked_border.color = theme.colors.on_surface_variant;
   checkbox.disabled_checked_background = theme.colors.surface_container_highest;
   checkbox.disabled_checkmark = theme.colors.on_surface_variant;
-  checkbox.disabled_unchecked_border = theme.colors.outline;
-  checkbox.corner_radius = 5.0F;
+  checkbox.disabled_unchecked_border.color = theme.colors.outline;
+  checkbox.corner_radii = CornerRadii{5.0F};
   return checkbox;
 }
 
@@ -96,7 +96,7 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   button.disabled_label = theme.colors.on_surface_variant;
   button.padding = EdgeInsets::Symmetric(16.0F, 9.0F);
   button.minimum_height = 40.0F;
-  button.corner_radius = 10.0F;
+  button.corner_radii = CornerRadii{10.0F};
   definition.Set(button);
 
   IconButtonStyle icon_button = IconButtonStyle::Default();
@@ -118,11 +118,11 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   segmented.label_style =
       TextStyle{Font::System(13.0F).WithWeight(FontWeight::Medium), theme.colors.on_surface_variant};
   segmented.selected_label = theme.colors.on_secondary_container;
-  segmented.border = theme.colors.outline;
-  segmented.selected_border = theme.colors.secondary_container;
+  segmented.border.color = theme.colors.outline;
+  segmented.selected_border.color = theme.colors.secondary_container;
   segmented.padding = EdgeInsets::Symmetric(13.0F, 7.0F);
   segmented.minimum_height = 34.0F;
-  segmented.corner_radius = 10.0F;
+  segmented.corner_radii = CornerRadii{10.0F};
   definition.Set(segmented);
 
   TextFieldStyle text_field = TextFieldStyle::Default();
@@ -149,7 +149,7 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
                                                  : Color::Rgb(77, 112, 174, 0.20F);
   text_field.caret = theme.colors.primary;
   text_field.composition = theme.colors.primary;
-  text_field.corner_radius = 12.0F;
+  text_field.outlined.corner_radii = CornerRadii{12.0F};
   text_field.padding = EdgeInsets::Symmetric(12.0F, 10.0F);
   text_field.validation_error = theme.colors.error;
   text_field.error_label = theme.colors.error;
@@ -203,7 +203,7 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   ToastStyle toast = ToastStyle::Default();
   toast.background = theme.colors.inverse_surface;
   toast.text_style = TextStyle{Font::System(14.0F).WithWeight(FontWeight::Medium), theme.colors.inverse_on_surface};
-  toast.corner_radius = theme.shapes.medium;
+  toast.corner_radii = CornerRadii{theme.shapes.medium};
   definition.Set(toast);
 
   MenuStyle menu = MenuStyle::Default();
@@ -216,7 +216,7 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   menu.item_padding = EdgeInsets::Symmetric(14.0F, 9.0F);
   menu.minimum_item_height = 40.0F;
   menu.shadow = Shadow(Color::Rgb(0, 0, 0, mode == ThemeMode::Dark ? 0.28F : 0.12F), {0, 0}, 20, 0);
-  menu.corner_radius = theme.shapes.medium;
+  menu.corner_radii = CornerRadii{theme.shapes.medium};
   definition.Set(menu);
 
   DialogStyle dialog = DialogStyle::Default();
@@ -229,8 +229,8 @@ ThemeDefinition MailThemeDefinition(ThemeMode mode, bool reduced_motion) {
   dialog.negative_action_style =
       TextStyle{Font::System(14.0F).WithWeight(FontWeight::Medium), theme.colors.on_surface_variant};
   dialog.action_separator_color = theme.colors.outline;
-  dialog.action_corner_radius = 10.0F;
-  dialog.corner_radius = theme.shapes.large;
+  dialog.action_corner_radii = CornerRadii{10.0F};
+  dialog.corner_radii = CornerRadii{theme.shapes.large};
   definition.Set(dialog);
   return definition;
 }

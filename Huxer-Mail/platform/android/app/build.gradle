@@ -119,11 +119,6 @@ def registerHuxerUIResourceStaging = { String buildType, File resourceRoot, File
     tasks.matching { it.name == "merge${capitalizedBuildType}Assets" }.configureEach {
         dependsOn stagingTask
     }
-    tasks.matching {
-        it.name.contains(capitalizedBuildType) && it.name.toLowerCase().contains("lint")
-    }.configureEach {
-        dependsOn stagingTask
-    }
 }
 
 registerHuxerUIResourceStaging("debug", huxeruiDebugResourceRoot, huxeruiDebugAssets)

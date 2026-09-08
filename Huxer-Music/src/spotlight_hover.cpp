@@ -8,21 +8,21 @@ using namespace huxerui;
 
 class SpotlightHover::Extension final : public NodeExtension {
 public:
-  Extension(MountedNode& node, const SpotlightHover& value) {
+  Extension(ViewNode& node, const SpotlightHover& value) {
     Update(node, value);
   }
 
-  void Update(MountedNode&, const SpotlightHover& value) {
+  void Update(ViewNode&, const SpotlightHover& value) {
     value_ = value;
     InvalidatePaint(PaintInvalidation::Content);
   }
 
-  [[nodiscard]] bool HoverHitTest(MountedNode& node, Point position) const override {
+  [[nodiscard]] bool HoverHitTest(ViewNode& node, Point position) const override {
     const Size size = node.LayoutSize();
     return Rect{0.0F, 0.0F, size.width, size.height}.Contains(position);
   }
 
-  void OnHover(MountedNode&, const HoverEvent& event) override {
+  void OnHover(ViewNode&, const HoverEvent& event) override {
     if (event.type == HoverEventType::Leave) {
       intensity_.AnimateTo(0.0F, TweenSpec{0.18, Easing::EaseOut});
     } else {
@@ -34,13 +34,13 @@ public:
     InvalidatePaint(PaintInvalidation::Content);
   }
 
-  FrameResult OnFrame(MountedNode&, const FrameInfo& frame) override {
+  FrameResult OnFrame(ViewNode&, const FrameInfo& frame) override {
     const MotionAdvanceResult result = intensity_.Advance(frame);
     InvalidatePaint(PaintInvalidation::Content);
     return {result.needs_frame, result.wake_after};
   }
 
-  void PaintBehindContent(const MountedNode&, PaintContext& context) const override {
+  void PaintBehindContent(const ViewNode&, PaintContext& context) const override {
     const Rect bounds = context.Bounds();
     const float intensity = std::clamp(intensity_.Value(), 0.0F, 1.0F);
     if (intensity <= 0.001F || bounds.width <= 0.0F || bounds.height <= 0.0F) {

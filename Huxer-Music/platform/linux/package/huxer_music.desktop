@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Huxer Music
+Exec=huxer_music
+Icon=huxer_music
+Categories=Utility;
+Terminal=false

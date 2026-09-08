@@ -6,6 +6,8 @@
   <string>Huxer-Mail</string>
   <key>CFBundleIdentifier</key>
   <string>com.huxerui.demos.huxermail</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
   <key>CFBundleName</key>
   <string>Huxer-Mail</string>
   <key>CFBundlePackageType</key>

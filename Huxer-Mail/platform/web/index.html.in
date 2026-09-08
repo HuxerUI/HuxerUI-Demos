@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="icon" type="image/svg+xml" href="./@HUXERUI_WEB_FAVICON_FILE@">
+  <link rel="apple-touch-icon" href="./@HUXERUI_WEB_APPLE_TOUCH_ICON_FILE@">
   <title>Huxer-Mail</title>
   <style>
     html, body {

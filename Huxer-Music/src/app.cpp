@@ -168,7 +168,7 @@ ThemeDefinition MusicThemeDefinition(bool immersive_appearance) {
   search.selection = immersive_appearance ? Color::Rgb(140, 116, 255, 0.3F)
                                           : Color::Rgb(118, 150, 190, 0.28F);
   search.caret = theme.colors.primary;
-  search.corner_radius = 20.0F;
+  search.outlined.corner_radii = CornerRadii{20.0F};
   search.padding = EdgeInsets::Symmetric(13.0F, 8.0F);
   definition.Set(search);
 
@@ -187,7 +187,7 @@ ThemeDefinition MusicThemeDefinition(bool immersive_appearance) {
   menu.item_padding = EdgeInsets::Symmetric(12.0F, 8.0F);
   menu.minimum_width = 196.0F;
   menu.minimum_item_height = 38.0F;
-  menu.corner_radius = 13.0F;
+  menu.corner_radii = CornerRadii{13.0F};
   menu.shadow = Shadow{Color::Rgb(0, 0, 0, 0.38F), {0.0F, 8.0F}, 24.0F, 0.0F};
   menu.motion = PresentationMotion{
       .initial_scale = 0.98F,
@@ -202,7 +202,7 @@ ThemeDefinition MusicThemeDefinition(bool immersive_appearance) {
   toast.text_style = TextStyle{Font::System(12.5F).WithWeight(FontWeight::Medium), White(0.88F)};
   toast.padding = EdgeInsets::Symmetric(15.0F, 10.0F);
   toast.shadow = Shadow{Color::Rgb(0, 0, 0, 0.34F), {0.0F, 7.0F}, 22.0F, 0.0F};
-  toast.corner_radius = 12.0F;
+  toast.corner_radii = CornerRadii{12.0F};
   toast.viewport_padding = EdgeInsets{16.0F, 16.0F, 22.0F, 236.0F};
   toast.motion = PresentationMotion{
       .initial_scale = 0.98F,

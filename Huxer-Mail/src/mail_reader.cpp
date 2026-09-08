@@ -113,7 +113,7 @@ void ExportAttachment(
   }
   const File temporary(files->Directories().temporary_directory, SafeFileName(attachment.name));
   if (attachment.origin == AttachmentOrigin::Mock) {
-    if (!mock_content.HasValue() || !temporary.WriteBytes(mock_content.Bytes())) {
+    if (!mock_content.HasValue() || !temporary.WriteBytes(mock_content.ReadBytes())) {
       toast.Show(app::strings::attachment_export_failed);
       return;
     }

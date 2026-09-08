@@ -6,6 +6,8 @@
   <string>Huxer Music</string>
   <key>CFBundleIdentifier</key>
   <string>com.huxerui.demos.huxermusic</string>
+  <key>CFBundleIconFile</key>
+  <string>AppIcon</string>
   <key>CFBundleName</key>
   <string>Huxer Music</string>
   <key>CFBundlePackageType</key>

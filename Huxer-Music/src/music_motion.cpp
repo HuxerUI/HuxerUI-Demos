@@ -21,16 +21,16 @@ float WrapPhase(float value) {
 
 class AlbumMotion::Extension final : public NodeExtension {
 public:
-  Extension(MountedNode& node, const AlbumMotion& value) {
+  Extension(ViewNode& node, const AlbumMotion& value) {
     Update(node, value);
   }
 
-  void Update(MountedNode&, const AlbumMotion& value) {
+  void Update(ViewNode&, const AlbumMotion& value) {
     value_ = value;
     InvalidatePaint(PaintInvalidation::Content);
   }
 
-  FrameResult OnFrame(MountedNode&, const FrameInfo& frame) override {
+  FrameResult OnFrame(ViewNode&, const FrameInfo& frame) override {
     if (!value_.playing) {
       return {};
     }
@@ -41,7 +41,7 @@ public:
     return {.needs_frame = true};
   }
 
-  void PaintBehindContent(const MountedNode&, PaintContext& context) const override {
+  void PaintBehindContent(const ViewNode&, PaintContext& context) const override {
     const Rect bounds = context.Bounds();
     if (bounds.width <= 0.0F || bounds.height <= 0.0F) {
       return;
@@ -135,16 +135,16 @@ const detail::ModifierDescriptor& AlbumMotion::Descriptor() {
 
 class AmbientMotion::Extension final : public NodeExtension {
 public:
-  Extension(MountedNode& node, const AmbientMotion& value) {
+  Extension(ViewNode& node, const AmbientMotion& value) {
     Update(node, value);
   }
 
-  void Update(MountedNode&, const AmbientMotion& value) {
+  void Update(ViewNode&, const AmbientMotion& value) {
     value_ = value;
     InvalidatePaint(PaintInvalidation::Content);
   }
 
-  FrameResult OnFrame(MountedNode&, const FrameInfo& frame) override {
+  FrameResult OnFrame(ViewNode&, const FrameInfo& frame) override {
     if (!value_.playing) {
       return {};
     }
@@ -154,7 +154,7 @@ public:
     return {.needs_frame = true};
   }
 
-  void PaintBehindContent(const MountedNode&, PaintContext& context) const override {
+  void PaintBehindContent(const ViewNode&, PaintContext& context) const override {
     const Rect bounds = context.Bounds();
     if (bounds.width <= 0.0F || bounds.height <= 0.0F) {
       return;
@@ -200,16 +200,16 @@ const detail::ModifierDescriptor& AmbientMotion::Descriptor() {
 
 class EqualizerMotion::Extension final : public NodeExtension {
 public:
-  Extension(MountedNode& node, const EqualizerMotion& value) {
+  Extension(ViewNode& node, const EqualizerMotion& value) {
     Update(node, value);
   }
 
-  void Update(MountedNode&, const EqualizerMotion& value) {
+  void Update(ViewNode&, const EqualizerMotion& value) {
     value_ = value;
     InvalidatePaint(PaintInvalidation::Content);
   }
 
-  FrameResult OnFrame(MountedNode&, const FrameInfo& frame) override {
+  FrameResult OnFrame(ViewNode&, const FrameInfo& frame) override {
     const float delta = static_cast<float>(frame.delta_time);
     phase_ = WrapPhase(phase_ + delta * kTau * 1.65F);
 
@@ -231,7 +231,7 @@ public:
     return {.needs_frame = value_.playing || !settled};
   }
 
-  void PaintBehindContent(const MountedNode&, PaintContext& context) const override {
+  void PaintBehindContent(const ViewNode&, PaintContext& context) const override {
     const Rect bounds = context.Bounds();
     if (bounds.width <= 0.0F || bounds.height <= 0.0F) {
       return;

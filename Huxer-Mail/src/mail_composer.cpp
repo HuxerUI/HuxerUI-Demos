@@ -245,7 +245,7 @@ View ComposerView(bool compact) {
                   .content_types = {"image/*", "application/pdf", "text/plain"},
               });
               for (FileReference& reference : selected) {
-                FileResult<std::vector<std::byte>> content = co_await reference.ReadBytesAsync();
+                IoResult<Bytes> content = co_await reference.ReadBytesAsync();
                 if (!content.Succeeded()) {
                   interaction.attachment_errors.Update([name = reference.Name()](std::vector<std::string>& errors) {
                     errors.push_back(name);
