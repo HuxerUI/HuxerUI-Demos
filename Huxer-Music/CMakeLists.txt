@@ -40,4 +40,15 @@ if (MSVC)
     target_compile_options(huxer_music PRIVATE /utf-8)
 endif ()
 
+# Keep dependency population paths within Windows toolchain path limits.
+include(FetchContent)
+string(SHA256 MUSIC_BUILD_ID "${CMAKE_CURRENT_BINARY_DIR}")
+string(SUBSTRING "${MUSIC_BUILD_ID}" 0 8 MUSIC_BUILD_ID)
+set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.huxerui/${MUSIC_BUILD_ID}")
+huxerui_use_library(huxer_music
+        TARGET HuxerUI::MediaPlayer
+        URL "https://github.com/HuxerUI/Lib-MediaPlayer.git"
+        COMMIT "4243f48f19b5314236c62cb9f5db39daf6865bf3"
+)
+
 huxerui_configure_project_app(huxer_music)

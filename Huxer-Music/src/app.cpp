@@ -3,8 +3,6 @@
 #include <cctype>
 #include <cstddef>
 #include <functional>
-#include <iomanip>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -13,6 +11,7 @@
 #include <huxerui/huxerui.h>
 
 #include "music_motion.h"
+#include "music_playback.h"
 #include "spotlight_hover.h"
 
 using namespace huxerui;
@@ -20,91 +19,15 @@ using namespace huxerui;
 namespace huxer_music {
 namespace {
 
-struct Track {
-  std::string_view title;
-  std::string_view artist;
-  std::string_view collection;
-  std::string_view elapsed;
-  std::string_view duration;
-  float progress;
-  Color background;
-  Color accent;
-  Color secondary;
-  std::array<std::string_view, 7> lyrics;
-  std::size_t active_line;
-};
+bool MobileHost() {
+#if defined(__ANDROID__)
+  return true;
+#else
+  return false;
+#endif
+}
 
-enum class AppPage {
-  ForYou,
-  Discover,
-  Library,
-};
-
-const std::array<Track, 3> kTracks{{
-    {
-        "Afterglow Avenue",
-        "Mira Vale",
-        "Nocturne Signals",
-        "1:42",
-        "4:18",
-        0.395F,
-        Color::Rgb(13, 18, 31),
-        Color::Rgb(117, 92, 255),
-        Color::Rgb(250, 102, 143),
-        {
-            "Streetlights drift across the glass",
-            "Another quiet hour moves past",
-            "We let the city lose its name",
-            "And leave our shadows in the rain",
-            "Hold the moment, let it glow",
-            "There is nowhere else to go",
-            "Meet me on Afterglow Avenue",
-        },
-        3,
-    },
-    {
-        "Soft Static",
-        "North Window",
-        "Rooms Without Clocks",
-        "2:16",
-        "3:46",
-        0.602F,
-        Color::Rgb(11, 25, 28),
-        Color::Rgb(48, 202, 170),
-        Color::Rgb(88, 141, 255),
-        {
-            "Low light moving through the room",
-            "Silver voices out of tune",
-            "Every signal settles slow",
-            "Like a language only we know",
-            "Stay inside the soft static",
-            "Nothing here has to be dramatic",
-            "Morning can wait outside",
-        },
-        4,
-    },
-    {
-        "Sunset Receiver",
-        "June Arcade",
-        "Signals From Home",
-        "0:58",
-        "3:31",
-        0.275F,
-        Color::Rgb(30, 15, 20),
-        Color::Rgb(255, 126, 78),
-        Color::Rgb(244, 71, 134),
-        {
-            "Tune the dial into the fading blue",
-            "Every station leads me back to you",
-            "Summer humming underneath the wires",
-            "Tiny sparks becoming open fires",
-            "Send a signal through the evening air",
-            "I will answer if you meet me there",
-            "The sunset receiver stays awake",
-        },
-        2,
-    },
-}};
+enum class AppPage { ForYou, Discover, Library };
 
 Color White(float opacity = 1.0F) {
   return Color::Rgb(255, 255, 255, opacity);
@@ -281,7 +204,7 @@ View AccountPopup(PopupContext context, ToastHandle toast) {
 
   return Column{
       Row{
-          Row{Text("HV").Style({Font::System(13.0F).WithWeight(FontWeight::Bold), White()})}
+          Row{Text("JW").Style({Font::System(13.0F).WithWeight(FontWeight::Bold), White()})}
               .With(
                   Frame{.width = 44.0F, .height = 44.0F},
                   MainAlign(MainAxisAlignment::Center),
@@ -428,13 +351,14 @@ View TrackRow(const Track& track, std::size_t index, bool selected, bool playing
 View Sidebar(AppPage page, std::size_t selected_track, bool playing, State<bool> immersive_appearance,
              State<AppPage> page_state, State<TextEditingValue> search_state,
              std::function<void(std::size_t)> select_track) {
+  const auto catalog = UseEnvironment<MusicContext>().tracks.Get();
   const PopupHandle account_popup = UsePopup();
   const MenuHandle user_menu = UseMenu();
   const ToastHandle toast = UseToast();
   const WindowHandle window = UseWindow();
   Views tracks;
-  for (std::size_t index = 0; index < kTracks.size(); ++index) {
-    tracks.Add(TrackRow(kTracks[index], index, index == selected_track, playing, [=] {
+  for (std::size_t index = 0; index < catalog.size(); ++index) {
+    tracks.Add(TrackRow(catalog[index], index, index == selected_track, playing, [=] {
       select_track(index);
       page_state = AppPage::ForYou;
       search_state = TextEditingValue::FromText({});
@@ -507,7 +431,7 @@ View Sidebar(AppPage page, std::size_t selected_track, bool playing, State<bool>
       Spacer().With(Grow()),
       Row{
           Row{
-              Row{Text("HV").Style({Font::System(11.0F).WithWeight(FontWeight::Bold), White()})}
+              Row{Text("JW").Style({Font::System(11.0F).WithWeight(FontWeight::Bold), White()})}
                   .With(
                       Frame{.width = 34.0F, .height = 34.0F},
                       MainAlign(MainAxisAlignment::Center),
@@ -566,6 +490,17 @@ View Sidebar(AppPage page, std::size_t selected_track, bool playing, State<bool>
       );
 }
 
+[[huxerui::composable]]
+View LibraryMenu() {
+  const auto music = UseEnvironment<MusicContext>();
+  const auto menu = UseMenu();
+  return IconButton(app::images::more, "Library options").With(menu.Anchor()).OnClick([=] {
+    menu.Show({MenuItem("Open local audio", [music] { OpenAudio(music); })
+        .Enabled(music.ready.Get() && !music.picking.Get())});
+  });
+}
+
+[[huxerui::composable]]
 View TopBar(State<TextEditingValue> search_state) {
   TextField search(search_state);
   search = std::move(search)
@@ -581,18 +516,18 @@ View TopBar(State<TextEditingValue> search_state) {
   return Row{
       std::move(search).With(Frame{.width = 320.0F, .height = 40.0F}),
       Spacer().With(Grow()),
-      Row{
-          Row{}.With(Frame{.width = 6.0F, .height = 6.0F}, Background(Color::Rgb(95, 225, 163)), CornerRadius(3.0F)),
-          Text(app::strings::mock_notice).Style({Font::System(11.0F), White(0.42F)}),
-      }
-          .With(Spacing(8.0F), CrossAlign(CrossAxisAlignment::Center)),
   }
       .With(CrossAlign(CrossAxisAlignment::Center), Frame{.height = 44.0F});
 }
 
-View AlbumArtwork(const Track& track, bool playing) {
+View AlbumArtwork(const Track& track, bool playing, float artwork_size = 348.0F) {
   View artwork = Canvas([track](PaintContext& context, Size size) {
                    const Rect bounds{0.0F, 0.0F, size.width, size.height};
+                   if (MobileHost()) {
+                     context.DrawRect(bounds, Mix(track.accent, track.background, 0.3F), CornerRadii{28});
+                     context.DrawCircle({size.width * 0.12F, size.height * 0.16F}, size.width * 0.65F,
+                         Color{track.secondary.red, track.secondary.green, track.secondary.blue, 0.32F});
+                   } else {
                    context.DrawRect(
                        bounds,
                        LinearGradient{
@@ -620,6 +555,7 @@ View AlbumArtwork(const Track& track, bool playing) {
                        },
                        CornerRadii{28.0F}
                    );
+                   }
                    context.DrawLine(
                        {size.width * 0.12F, size.height * 0.78F},
                        {size.width * 0.88F, size.height * 0.78F},
@@ -628,14 +564,14 @@ View AlbumArtwork(const Track& track, bool playing) {
                    );
                  })
                      .With(
-                         Frame{.width = 348.0F, .height = 348.0F},
+                         Frame{.width = artwork_size, .height = artwork_size},
                          Align(HorizontalAlignment::Stretch, VerticalAlignment::Stretch)
                      );
 
   return Stack{
       std::move(artwork),
       Row{}.With(
-          Frame{.width = 348.0F, .height = 348.0F},
+          Frame{.width = artwork_size, .height = artwork_size},
           Align(HorizontalAlignment::Stretch, VerticalAlignment::Stretch),
           AlbumMotion{
               .playing = playing,
@@ -645,9 +581,9 @@ View AlbumArtwork(const Track& track, bool playing) {
       ),
       Column{
           Row{
-              Text("HUXER ORIGINAL").Style({Font::System(10.0F).WithWeight(FontWeight::Bold), White(0.76F)}),
+              Text("HUXER MUSIC").Style({Font::System(10.0F).WithWeight(FontWeight::Bold), White(0.76F)}),
               Spacer().With(Grow()),
-              Text("HX·032").Style({Font::System(10.0F).WithWeight(FontWeight::Medium), White(0.56F)}),
+              Text("AUDIO").Style({Font::System(10.0F).WithWeight(FontWeight::Medium), White(0.56F)}),
           },
           Spacer().With(Grow()),
           Text(std::string(track.collection))
@@ -657,7 +593,7 @@ View AlbumArtwork(const Track& track, bool playing) {
           .With(Padding(24.0F), Spacing(5.0F), Align(HorizontalAlignment::Stretch, VerticalAlignment::Stretch)),
   }
       .With(
-          Frame{.width = 348.0F, .height = 348.0F},
+          Frame{.width = artwork_size, .height = artwork_size},
           CornerRadius(28.0F),
           ClipChildren(),
           Shadow(Ink(0.56F), {0.0F, 18.0F}, 42.0F, -4.0F),
@@ -682,49 +618,38 @@ View AlbumPanel(const Track& track, bool playing) {
       .With(Spacing(24.0F), CrossAlign(CrossAxisAlignment::Center), Frame{.width = 410.0F});
 }
 
-View LyricsPanel(const Track& track) {
+[[huxerui::composable]]
+View LyricsPanel(const Track& track, bool compact = false) {
+  static constexpr std::array<std::string_view, 7> lyrics{
+      "Streetlights drift across the glass",
+      "Another quiet hour moves past",
+      "We let the city lose its name",
+      "And leave our shadows in the rain",
+      "Hold the moment, let it glow",
+      "There is nowhere else to go",
+      "Let the music carry us home",
+  };
+  const auto music = UseEnvironment<MusicContext>();
+  const auto progress = music.player->Snapshot().progress;
+  const double duration = progress.duration ? progress.duration->count() : 0.0;
+  const int active = duration > 0 ? std::clamp(static_cast<int>(progress.position.count() / duration * lyrics.size()), 0, 6) : 0;
+  const int count = compact ? 3 : 7;
+  const int start = std::clamp(active - count / 2, 0, static_cast<int>(lyrics.size()) - count);
   Views lines;
-  for (std::size_t index = 0; index < track.lyrics.size(); ++index) {
-    const bool active = index == track.active_line;
-    lines.Add(
-        Text(std::string(track.lyrics[index]))
-            .Style({
-                Font::System(active ? 22.0F : 15.0F)
-                    .WithWeight(active ? FontWeight::Bold : FontWeight::Medium),
-                active ? White() : White(index < track.active_line ? 0.28F : 0.48F),
-            })
-            .With(
-                Opacity(AnimateTo(active ? 1.0F : 0.86F, TweenSpec{0.26, Easing::EaseOut})),
-                Offset(AnimateTo(active ? Point{10.0F, 0.0F} : Point{}, TweenSpec{0.3, Easing::EaseOut}))
-            )
-    );
+  for (int index = start; index < start + count; ++index) {
+    lines.Add(Text(std::string(lyrics[index])).Align(TextAlign::Center)
+        .Style({Font::System(index == active ? (compact ? 18.0F : 22.0F) : (compact ? 13.0F : 15.0F))
+            .WithWeight(index == active ? FontWeight::Bold : FontWeight::Medium),
+            White(index == active ? 1.0F : 0.38F)})
+        .With(Opacity(AnimateTo(index == active ? 1.0F : 0.7F, TweenSpec{0.25, Easing::EaseOut}))));
   }
-
   return Column{
-      Row{
-          Text(app::strings::lyrics)
-              .Style({Font::System(10.5F).WithWeight(FontWeight::Bold), White(0.44F)}),
-          Spacer().With(Grow()),
-          Row{
-              Row{}.With(Frame{.width = 5.0F, .height = 5.0F}, Background(track.accent), CornerRadius(2.5F)),
-              Text("SYNCED").Style({Font::System(9.5F).WithWeight(FontWeight::Bold), White(0.38F)}),
-          }
-              .With(Spacing(6.0F), CrossAlign(CrossAxisAlignment::Center)),
-      },
-      Spacer().With(Grow()),
-      Column{std::move(lines)}.With(Spacing(18.0F)),
-      Spacer().With(Grow()),
-      Row{
-          Text("LOSSLESS").Style({Font::System(9.5F).WithWeight(FontWeight::Bold), White(0.52F)}),
-          Row{}.With(Frame{.width = 3.0F, .height = 3.0F}, Background(White(0.3F)), CornerRadius(1.5F)),
-          Text("24-BIT / 96 KHZ").Style({Font::System(9.5F).WithWeight(FontWeight::Medium), White(0.34F)}),
-      }
-          .With(Spacing(8.0F), CrossAlign(CrossAxisAlignment::Center)),
-  }
-      .With(
-          Padding(EdgeInsets{22.0F, 18.0F, 18.0F, 18.0F}),
-          Frame{.width = 460.0F, .height = 500.0F, .min_width = 460.0F, .max_width = 460.0F}
-      );
+      Row{Text(app::strings::lyrics).Style({Font::System(10).WithWeight(FontWeight::Bold), White(0.45F)}),
+          Spacer().With(Grow()), Text("DEMO").Style({Font::System(9).WithWeight(FontWeight::Medium), track.accent})},
+      Column{std::move(lines)}.With(Spacing(compact ? 14.0F : 24.0F), Grow(),
+          MainAlign(MainAxisAlignment::Center), CrossAlign(CrossAxisAlignment::Stretch)),
+  }.With(Spacing(12), CrossAlign(CrossAxisAlignment::Stretch), Padding(compact ? 12.0F : 18.0F),
+      Frame{.width = compact ? std::optional<float>{} : std::optional<float>{460.0F}, .height = compact ? 176.0F : 500.0F});
 }
 
 View ActionIcon(ImageVariant icon, StringVariant label, std::function<void()> action, Color tint = White(0.72F)) {
@@ -746,7 +671,7 @@ View ActionIcon(ImageVariant icon, StringVariant label, std::function<void()> ac
       );
 }
 
-View PlayButton(bool playing, State<bool> playing_state) {
+View PlayButton(bool playing, std::function<void()> action) {
   const ImageVariant icon = playing ? ImageVariant(app::images::pause) : ImageVariant(app::images::play);
   const StringVariant label = playing ? StringVariant(app::strings::pause) : StringVariant(app::strings::play);
   return Row{
@@ -754,7 +679,7 @@ View PlayButton(bool playing, State<bool> playing_state) {
           Frame{.width = 25.0F, .height = 25.0F}
       ),
   }
-      .OnClick([playing_state] { playing_state = !playing_state.Get(); })
+      .OnClick(std::move(action))
       .With(
           Frame{.width = 68.0F, .height = 68.0F},
           MainAlign(MainAxisAlignment::Center),
@@ -767,32 +692,6 @@ View PlayButton(bool playing, State<bool> playing_state) {
           PointerCursor(PointerCursorKind::Hand),
           Semantics{.role = SemanticRole::Button, .label = label}
       );
-}
-
-int TimestampSeconds(std::string_view timestamp) {
-  const std::size_t separator = timestamp.find(':');
-  if (separator == std::string_view::npos) {
-    return 0;
-  }
-
-  int minutes = 0;
-  int seconds = 0;
-  for (std::size_t index = 0; index < separator; ++index) {
-    minutes = minutes * 10 + static_cast<int>(timestamp[index] - '0');
-  }
-  for (std::size_t index = separator + 1; index < timestamp.size(); ++index) {
-    seconds = seconds * 10 + static_cast<int>(timestamp[index] - '0');
-  }
-  return minutes * 60 + seconds;
-}
-
-std::string ElapsedTime(const Track& track, float progress) {
-  const int elapsed = static_cast<int>(
-      static_cast<float>(TimestampSeconds(track.duration)) * std::clamp(progress, 0.0F, 1.0F) + 0.5F
-  );
-  std::ostringstream stream;
-  stream << elapsed / 60 << ':' << std::setfill('0') << std::setw(2) << elapsed % 60;
-  return stream.str();
 }
 
 SliderStyle PlaybackSliderStyle(float width, Color active, float thumb_size) {
@@ -815,52 +714,56 @@ SliderStyle PlaybackSliderStyle(float width, Color active, float thumb_size) {
   return style;
 }
 
-View PlaybackProgress(const Track& track, State<float> progress_state) {
-  Slider progress(progress_state);
-  progress = std::move(progress)
-                 .Range(0.0F, 1.0F)
-                 .Step(0.001F)
-                 .OnChanged([progress_state](float value) { progress_state = value; });
-
+[[huxerui::composable]]
+View PlaybackProgress(bool compact = false) {
+  const auto music = UseEnvironment<MusicContext>();
+  const auto snapshot = music.player->Snapshot();
+  const auto draft = UseState(std::optional<float>{});
+  const auto duration = snapshot.progress.duration;
+  const bool seekable = duration && duration->count() > 0 && snapshot.seekability == MediaSeekability::Seekable;
+  const float maximum = seekable ? static_cast<float>(duration->count()) : 1.0F;
+  const float position = draft.Get().value_or(static_cast<float>(snapshot.progress.position.count()));
+  auto slider = Slider(std::clamp(position, 0.0F, maximum)).Range(0, maximum)
+      .OnChanged([draft, seekable](float value) { if (seekable) draft = value; })
+      .OnCommitted([music, draft, seekable](float value) {
+        if (seekable) (void)music.player->SeekTo(MediaTime{value});
+        draft = std::optional<float>{};
+      }).OnCanceled([draft]() { draft = std::optional<float>{}; });
   return Row{
-      Text(ElapsedTime(track, progress_state.Get()))
-          .Style({Font::System(10.5F).WithWeight(FontWeight::Medium), White(0.42F)})
-          .With(Frame{.width = 32.0F, .min_width = 32.0F, .max_width = 32.0F}),
-      ProvideEnvironment(PlaybackSliderStyle(360.0F, White(0.78F), 8.0F), std::move(progress)),
-      Text(std::string(track.duration))
-          .Style({Font::System(10.5F).WithWeight(FontWeight::Medium), White(0.42F)})
-          .With(Frame{.width = 32.0F, .min_width = 32.0F, .max_width = 32.0F}),
-  }
-      .With(Spacing(10.0F), CrossAlign(CrossAxisAlignment::Center));
+      Text(TimeLabel(position)).Style({Font::System(11), White(0.6F)}).With(Frame{.width = 38.0F}),
+      Row{ProvideEnvironment(PlaybackSliderStyle(compact ? 180.0F : 360.0F, White(0.78F), 8),
+          std::move(slider).With(Enabled(seekable), Grow()))}.With(Grow()),
+      Text(duration ? TimeLabel(duration->count()) : "--:--").Style({Font::System(11), White(0.6F)}).With(Frame{.width = 38.0F}),
+  }.With(Spacing(8), CrossAlign(CrossAxisAlignment::Center));
 }
 
-View VolumeSlider(State<float> volume_state) {
-  Slider volume(volume_state);
-  volume = std::move(volume)
-               .Range(0.0F, 1.0F)
-               .Step(0.01F)
-               .OnChanged([volume_state](float value) { volume_state = value; });
-  return ProvideEnvironment(PlaybackSliderStyle(82.0F, White(0.58F), 7.0F), std::move(volume));
+[[huxerui::composable]]
+View VolumeSlider() {
+  const auto music = UseEnvironment<MusicContext>();
+  return ProvideEnvironment(PlaybackSliderStyle(82, White(0.58F), 7),
+      Slider(static_cast<float>(music.player->Snapshot().volume)).Range(0, 1).Step(0.01F)
+          .OnChanged([music](float value) { (void)music.player->SetVolume(value); }));
 }
 
-View PlayerDock(const Track& track, bool playing, bool liked, State<std::size_t> track_index,
-                State<bool> playing_state, State<bool> liked_state, State<float> progress_state,
-                State<float> volume_state, const SceneTransitionHandle& transition) {
-  const auto switch_track = [=](int direction) {
-    const std::size_t current = track_index.Get();
-    const std::size_t next = direction > 0 ? (current + 1) % kTracks.size()
-                                           : (current + kTracks.size() - 1) % kTracks.size();
-    transition.RunFromCurrentInteraction(
-        CircularRevealSceneTransition{.animation = TweenSpec{0.42, Easing::EaseInOut}},
-        [=] {
-          track_index = next;
-          playing_state = true;
-          liked_state = false;
-          progress_state = kTracks[next].progress;
-        }
-    );
+[[huxerui::composable]]
+View TransportControls(std::function<void(std::size_t)> select_track) {
+  const auto music = UseEnvironment<MusicContext>();
+  const auto state = music.player->Snapshot();
+  const auto change = [=](int direction) {
+    const auto count = music.tracks.Get().size();
+    select_track((music.index.Get() + count + direction) % count);
   };
+  return Row{
+      ActionIcon(app::images::previous, app::strings::previous_track, [=] { change(-1); }),
+      PlayButton(state.play_when_ready, [music] { TogglePlayback(music); }),
+      ActionIcon(app::images::next, app::strings::next_track, [=] { change(1); }),
+  }.With(Spacing(22), MainAlign(MainAxisAlignment::Center), CrossAlign(CrossAxisAlignment::Center), Enabled(music.ready.Get()));
+}
 
+[[huxerui::composable]]
+View PlayerDock(const Track& track, bool liked, State<bool> liked_state,
+                std::function<void(std::size_t)> select_track, std::function<void()> open_queue) {
+  const auto music = UseEnvironment<MusicContext>();
   return Row{
       Row{
           Stack{
@@ -900,19 +803,14 @@ View PlayerDock(const Track& track, bool playing, bool liked, State<std::size_t>
               Frame{.width = 240.0F, .min_width = 240.0F, .max_width = 240.0F}
           ),
       Column{
-          Row{
-              ActionIcon(app::images::previous, app::strings::previous_track, [=] { switch_track(-1); }),
-              PlayButton(playing, playing_state),
-              ActionIcon(app::images::next, app::strings::next_track, [=] { switch_track(1); }),
-          }
-              .With(Spacing(18.0F), MainAlign(MainAxisAlignment::Center), CrossAlign(CrossAxisAlignment::Center)),
-          PlaybackProgress(track, progress_state),
+          TransportControls(select_track),
+          PlaybackProgress().Key(static_cast<int>(music.index.Get())),
       }
           .With(Spacing(6.0F), Grow(), CrossAlign(CrossAxisAlignment::Center)),
       Row{
           Image(app::images::volume).Tint(White(0.52F)).With(Frame{.width = 18.0F, .height = 18.0F}),
-          VolumeSlider(volume_state),
-          ActionIcon(app::images::queue, app::strings::queue, [] {}),
+          VolumeSlider(),
+          ActionIcon(app::images::queue, app::strings::queue, open_queue),
       }
           .With(
               Spacing(10.0F),
@@ -951,6 +849,9 @@ bool MatchesTrack(const Track& track, std::string_view query) {
 View ArtworkTile(const Track& track, float width, float height, float radius) {
   return Canvas([=](PaintContext& context, Size size) {
            const Rect bounds{0.0F, 0.0F, size.width, size.height};
+           if (MobileHost()) {
+             context.DrawRect(bounds, Mix(track.accent, track.secondary, 0.35F), CornerRadii{radius});
+           } else {
            context.DrawRect(
                bounds,
                LinearGradient{
@@ -976,6 +877,7 @@ View ArtworkTile(const Track& track, float width, float height, float radius) {
                },
                CornerRadii{radius}
            );
+           }
            context.DrawCircle({size.width * 0.67F, size.height * 0.44F}, std::min(size.width, size.height) * 0.23F,
                               Ink(0.48F));
            context.DrawCircle({size.width * 0.67F, size.height * 0.44F}, std::min(size.width, size.height) * 0.055F,
@@ -1106,24 +1008,26 @@ View SmallTrackCard(const Track& track, std::size_t index, std::function<void()>
       );
 }
 
+[[huxerui::composable]]
 View DiscoverPage(std::function<void(std::size_t)> select_track) {
+  const auto catalog = UseEnvironment<MusicContext>().tracks.Get();
   Views releases;
-  for (std::size_t index = 0; index < kTracks.size(); ++index) {
-    releases.Add(SmallTrackCard(kTracks[index], index, [=] { select_track(index); }));
+  for (std::size_t index = 0; index < std::min(std::size_t{3}, catalog.size()); ++index) {
+    releases.Add(SmallTrackCard(catalog[index], index, [=] { select_track(index); }));
   }
 
   return Column{
-      PageHeading("EXPLORE", "Discover", "New colors, late-night frequencies, and handpicked signals.", kTracks[1].accent),
+      PageHeading("EXPLORE", "Discover", "New colors, late-night frequencies, and handpicked signals.", catalog[1].accent),
       Row{
-          DiscoverHero(kTracks[1], [=] { select_track(1); }),
-          MixCard("Midnight Current", "A continuous mix for the hours after dark", kTracks[1].accent,
-                  kTracks[0].secondary),
+          DiscoverHero(catalog[1], [=] { select_track(1); }),
+          MixCard("Independent sounds", "Three songs by Josh Woodward · CC BY 4.0", catalog[1].accent,
+                  catalog[0].secondary),
       }
           .With(Spacing(16.0F)),
       Row{
-          Text("New releases").Style({Font::System(15.0F).WithWeight(FontWeight::SemiBold), White(0.86F)}),
+          Text("Offline collection").Style({Font::System(15.0F).WithWeight(FontWeight::SemiBold), White(0.86F)}),
           Spacer().With(Grow()),
-          Text("Updated today").Style({Font::System(10.5F), White(0.35F)}),
+          Text("Josh Woodward · CC BY 4.0").Style({Font::System(10.5F), White(0.35F)}),
       }
           .With(CrossAlign(CrossAxisAlignment::Center)),
       Row{std::move(releases)}.With(Spacing(12.0F)),
@@ -1131,7 +1035,9 @@ View DiscoverPage(std::function<void(std::size_t)> select_track) {
       .With(Spacing(16.0F), Grow());
 }
 
+[[huxerui::composable]]
 View LibraryTrackRow(const Track& track, std::size_t index, bool selected, std::function<void()> action) {
+  const bool active = selected && UseEnvironment<MusicContext>().playing.Get();
   return Row{
       ArtworkTile(track, 48.0F, 48.0F, 10.0F),
       Column{
@@ -1142,7 +1048,7 @@ View LibraryTrackRow(const Track& track, std::size_t index, bool selected, std::
       }
           .With(Spacing(3.0F), Grow()),
       Text(std::string(track.duration)).Style({Font::System(10.5F).WithWeight(FontWeight::Medium), White(0.34F)}),
-      Image(selected ? ImageVariant(app::images::pause) : ImageVariant(app::images::play))
+      Image(active ? ImageVariant(app::images::pause) : ImageVariant(app::images::play))
           .Tint(selected ? track.accent : White(0.48F))
           .With(Frame{.width = 15.0F, .height = 15.0F}),
   }
@@ -1182,37 +1088,40 @@ View StatCard(std::string_view value, std::string_view label, Color accent) {
       );
 }
 
+[[huxerui::composable]]
 View LibraryPage(std::size_t selected_track, bool liked, std::function<void(std::size_t)> select_track) {
+  const auto catalog = UseEnvironment<MusicContext>().tracks.Get();
   Views tracks;
-  for (std::size_t index = 0; index < kTracks.size(); ++index) {
-    tracks.Add(LibraryTrackRow(kTracks[index], index, index == selected_track, [=] { select_track(index); }));
+  for (std::size_t index = 0; index < catalog.size(); ++index) {
+    tracks.Add(LibraryTrackRow(catalog[index], index, index == selected_track, [=] { select_track(index); }));
   }
 
   return Column{
-      PageHeading("YOUR COLLECTION", "Your Library", "Saved sounds and recently played sessions.", kTracks[0].accent),
+      Row{PageHeading("YOUR COLLECTION", "Your Library", "Offline songs and local audio.", catalog[0].accent).With(Grow()), LibraryMenu()}
+          .With(CrossAlign(CrossAxisAlignment::Center)),
       Row{
-          StatCard("12", "Tracks", kTracks[0].accent),
-          StatCard(liked ? "1" : "0", "Favorites", kTracks[0].secondary),
-          StatCard("48 min", "Listening time", kTracks[1].accent),
+          StatCard(std::to_string(catalog.size()), "Tracks", catalog[0].accent),
+          StatCard(liked ? "1" : "0", "Favorites", catalog[0].secondary),
+          StatCard("3", "Offline songs", catalog[1].accent),
       }
           .With(Spacing(12.0F)),
       Row{
           Column{
               Row{
-                  Text("Recently played").Style({Font::System(15.0F).WithWeight(FontWeight::SemiBold), White(0.86F)}),
+                  Text("All tracks").Style({Font::System(15.0F).WithWeight(FontWeight::SemiBold), White(0.86F)}),
                   Spacer().With(Grow()),
-                  Text("3 tracks").Style({Font::System(10.5F), White(0.34F)}),
+                  Text(std::to_string(catalog.size()) + " tracks").Style({Font::System(10.5F), White(0.34F)}),
               },
               Column{std::move(tracks)}.With(Spacing(3.0F)),
           }
               .With(Spacing(10.0F), Grow()),
           Column{
-              Text("FEATURED PLAYLIST").Style({Font::System(9.5F).WithWeight(FontWeight::Bold), kTracks[2].accent}),
+              Text("BUNDLED MUSIC").Style({Font::System(9.5F).WithWeight(FontWeight::Bold), catalog[2].accent}),
               Spacer().With(Grow()),
-              Text("Late Night Flow").Style({Font::System(19.0F).WithWeight(FontWeight::Bold), White(0.92F)}),
-              Text("12 tracks · Curated for focus").Style({Font::System(10.5F), White(0.42F)}),
+              Text("Josh Woodward").Style({Font::System(19.0F).WithWeight(FontWeight::Bold), White(0.92F)}),
+              Text("3 songs · CC BY 4.0").Style({Font::System(10.5F), White(0.42F)}),
               Row{
-                  Text("HV").Style({Font::System(10.0F).WithWeight(FontWeight::Bold), White()}),
+                  Text("JW").Style({Font::System(10.0F).WithWeight(FontWeight::Bold), White()}),
               }
                   .With(
                       Frame{.width = 28.0F, .height = 28.0F},
@@ -1240,16 +1149,18 @@ View LibraryPage(std::size_t selected_track, bool liked, std::function<void(std:
       .With(Spacing(17.0F), Grow());
 }
 
+[[huxerui::composable]]
 View SearchResultsPage(std::string_view query, std::size_t selected_track,
                        std::function<void(std::size_t)> select_track) {
+  const auto catalog = UseEnvironment<MusicContext>().tracks.Get();
   Views results;
   std::size_t match_count = 0;
-  for (std::size_t index = 0; index < kTracks.size(); ++index) {
-    if (!MatchesTrack(kTracks[index], query)) {
+  for (std::size_t index = 0; index < catalog.size(); ++index) {
+    if (!MatchesTrack(catalog[index], query)) {
       continue;
     }
     ++match_count;
-    results.Add(LibraryTrackRow(kTracks[index], index, index == selected_track, [=] { select_track(index); }));
+    results.Add(LibraryTrackRow(catalog[index], index, index == selected_track, [=] { select_track(index); }));
   }
 
   View body = match_count > 0
@@ -1282,34 +1193,81 @@ View SearchResultsPage(std::string_view query, std::size_t selected_track,
       PageHeading("SEARCH", "Results for “" + std::string(query) + "”",
                   match_count == 1 ? "1 match in your Huxer Music catalog"
                                    : std::to_string(match_count) + " matches in your Huxer Music catalog",
-                  kTracks[0].accent),
+                  catalog[0].accent),
       std::move(body).With(Grow()),
   }
       .With(Spacing(20.0F), Grow());
 }
 
 [[huxerui::composable]]
-View HuxerMusicApp() {
-  const State<std::size_t> track_index = UseState(std::size_t{0});
-  const State<bool> playing = UseState(true);
+View MobileMusic() {
+  const auto music = UseEnvironment<MusicContext>();
+  const auto selected_page = UseState(std::size_t{0});
+  const auto catalog = music.tracks.Get();
+  const auto track = catalog[music.index.Get()];
+  const auto select_track = [=](std::size_t index) {
+    SelectTrack(music, index);
+    selected_page = std::size_t{0};
+  };
+  Views rows;
+  for (std::size_t index = 0; index < catalog.size(); ++index)
+    rows.Add(LibraryTrackRow(catalog[index], index, music.index.Get() == index, [=] { select_track(index); }));
+  std::vector<View> pages;
+  pages.push_back(ScrollView{Column{
+      AlbumArtwork(track, music.playing.Get(), 220),
+      Column{Text(track.title).Align(TextAlign::Center).Style({Font::System(23).WithWeight(FontWeight::Bold), White()}),
+          Text(track.artist).Style({Font::System(13), White(0.58F)})}
+          .With(Spacing(7), CrossAlign(CrossAxisAlignment::Center)),
+      LyricsPanel(track, true).With(Align(HorizontalAlignment::Stretch)),
+  }.With(Spacing(18), Padding(EdgeInsets::Symmetric(20, 12)), CrossAlign(CrossAxisAlignment::Center))});
+  pages.push_back(ScrollView{Column{
+      Row{Text("Your library").Style({Font::System(24).WithWeight(FontWeight::Bold), White()}).With(Grow()), LibraryMenu()}
+          .With(CrossAlign(CrossAxisAlignment::Center)),
+      Text(std::to_string(catalog.size()) + " songs · ready to play").Style({Font::System(12), White(0.5F)}),
+      Column{std::move(rows)}.With(Spacing(6)),
+      Text("Bundled music by Josh Woodward\nGood to Go · On Brevity · Dizzy Spells\nCC BY 4.0 · joshwoodward.com\ncreativecommons.org/licenses/by/4.0/")
+          .Style({Font::System(11), White(0.45F)}),
+  }.With(Spacing(16), Padding(20), CrossAlign(CrossAxisAlignment::Stretch))});
+  return Theme(MusicThemeDefinition(true), Column{
+      Row{BrandMark(), Text("Huxer Music").Style({Font::System(17).WithWeight(FontWeight::Bold), White()}),
+          Spacer().With(Grow())}
+          .With(Spacing(10), Padding(EdgeInsets::Symmetric(20, 8)), CrossAlign(CrossAxisAlignment::Center)),
+      Tabs({"Now playing", "Library"}, selected_page).OnChanged([=](std::size_t page) { selected_page = page; })
+          .With(Padding(EdgeInsets::Symmetric(20, 0))),
+      Pager(std::move(pages), selected_page.Get()).OnChanged([=](std::size_t page) { selected_page = page; }).With(Grow()),
+      Column{PlaybackNotice(), PlaybackProgress(true).Key(static_cast<int>(music.index.Get())), TransportControls(select_track),
+          Row{Image(app::images::volume).Tint(White(0.5F)).With(Frame{.width = 18.0F, .height = 18.0F}), VolumeSlider()}
+              .With(Spacing(10), MainAlign(MainAxisAlignment::Center), CrossAlign(CrossAxisAlignment::Center))}
+          .With(Spacing(10), Padding(EdgeInsets{12, 24, 16, 24}), Background(Ink(0.38F))),
+  }.With(CrossAlign(CrossAxisAlignment::Stretch), Background(track.background), SafeAreaPadding(),
+      SystemBarsAppearance{.status_bar_background = track.background, .navigation_bar_background = track.background,
+          .status_bar_content = SystemBarContentBrightness::Light, .navigation_bar_content = SystemBarContentBrightness::Light}));
+}
+
+[[huxerui::composable]]
+View MusicShell() {
+  if (MobileHost() || UseViewportClass() != ViewportClass::Expanded) return MobileMusic();
+
+  const auto music = UseEnvironment<MusicContext>();
+  const auto catalog = music.tracks.Get();
+  const auto track_index = music.index;
+  const auto playing = music.playing;
   const State<bool> liked = UseState(false);
-  const State<float> progress = UseState(kTracks[0].progress);
-  const State<float> volume = UseState(0.68F);
   const State<bool> immersive_appearance = UseState(true);
   const State<AppPage> page = UseState(AppPage::ForYou);
   const State<TextEditingValue> search = UseState(TextEditingValue::FromText({}));
   const State<bool> entered = UseState(false);
   const SceneTransitionHandle transition = UseSceneTransition();
-  const Track& track = kTracks[track_index.Get()];
+  const Track& track = catalog[track_index.Get()];
 
   Lifecycle([entered] { entered = true; });
 
   const auto select_track = [=](std::size_t index) {
-    if (index >= kTracks.size()) {
+    if (index >= catalog.size()) {
       return;
     }
     if (index == track_index.Get()) {
-      playing = true;
+      (void)music.player->Play();
       page = AppPage::ForYou;
       search = TextEditingValue::FromText({});
       return;
@@ -1317,10 +1275,8 @@ View HuxerMusicApp() {
     transition.RunFromCurrentInteraction(
         CircularRevealSceneTransition{.animation = TweenSpec{0.42, Easing::EaseInOut}},
         [=] {
-          track_index = index;
-          playing = true;
+          SelectTrack(music, index);
           liked = false;
-          progress = kTracks[index].progress;
           page = AppPage::ForYou;
           search = TextEditingValue::FromText({});
         }
@@ -1359,9 +1315,9 @@ View HuxerMusicApp() {
                            select_track),
                    Column{
                        TopBar(search),
+                       PlaybackNotice(),
                        std::move(content).With(Grow()),
-                       PlayerDock(track, playing.Get(), liked.Get(), track_index, playing, liked, progress, volume,
-                                  transition),
+                       PlayerDock(track, liked.Get(), liked, select_track, [=] { page = AppPage::Library; search = TextEditingValue::FromText({}); }),
                    }
                        .With(
                            Spacing(18.0F),
@@ -1400,6 +1356,11 @@ View HuxerMusicApp() {
   );
 }
 
+[[huxerui::composable]]
+View HuxerMusicApp() {
+  return ProvideEnvironment(UseMusic(), MusicShell());
+}
+
 AppOptions BuildOptions() {
   AppOptions options;
   options.window.title = "Huxer Music";
@@ -1413,6 +1374,7 @@ AppOptions BuildOptions() {
       .toggle_maximize = app::strings::window_toggle_maximize,
       .close = app::strings::window_close,
   };
+  options.root_hooks = {huxerui::media::Install};
   options.show_debug_overlay = false;
   return options;
 }
