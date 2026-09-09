@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Huxer Drive
+Exec=huxer_drive
+Icon=huxer_drive
+Categories=Utility;
+Terminal=false
