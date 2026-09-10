@@ -2,6 +2,14 @@
 
 Huxer Mail is a fully offline personal productivity mail client that uses a complete mail-handling workflow to exercise application-level HuxerUI capabilities. It never connects to a real mailbox and does not require an account, OAuth, IMAP, SMTP, or any network service.
 
+## Screenshot
+
+![Huxer Mail on Windows with an inbox, conversation list, and empty reader awaiting selection](../docs/screenshots/huxer-mail-desktop.png)
+
+*Windows · Three-column inbox with no conversation selected · Light theme*
+
+[All demos](../README.md) · [Screenshot notes](../docs/screenshots/README.md)
+
 ## Product capabilities
 
 - Inbox, Starred, Sent, Drafts, Outbox, and Trash folders, with Archive available through search.

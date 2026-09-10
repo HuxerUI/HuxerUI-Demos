@@ -2,6 +2,17 @@
 
 Huxer Drive is an offline personal cloud-drive demo with a blue-and-white workspace, original folder-and-cloud branding, and real app-owned file storage. It demonstrates organizing, importing, previewing, revising, sharing, and recovering personal files without an account or a server.
 
+## Screenshot
+
+<p align="center">
+  <img src="../docs/screenshots/huxer-drive-android.png" width="320" alt="Huxer Drive on Android showing recent sample files in grid view and bottom navigation">
+  <img src="../docs/screenshots/huxer-drive-preview-android.png" width="320" alt="Huxer Drive on Android previewing the sample Morning light image with Share, Download, and Details actions">
+</p>
+
+*Android · Recent files in grid view and image preview · Light theme*
+
+[All demos](../README.md) · [Screenshot notes](../docs/screenshots/README.md)
+
 ## Try the core flow
 
 - Open **Projects**, switch between list and grid, and browse the original sample files.
