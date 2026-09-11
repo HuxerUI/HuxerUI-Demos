@@ -102,7 +102,7 @@ void ExportAttachment(
     MailAttachment attachment,
     RawAsset mock_content,
     const TaskScope& tasks,
-    const std::shared_ptr<FileSystem>& files,
+    const File& temporary_directory,
     const std::shared_ptr<FilePicker>& picker,
     const ToastHandle& toast,
     std::string filter_name
@@ -111,7 +111,7 @@ void ExportAttachment(
     toast.Show(app::strings::attachment_save_unavailable);
     return;
   }
-  const File temporary(files->Directories().temporary_directory, SafeFileName(attachment.name));
+  const File temporary(temporary_directory, SafeFileName(attachment.name));
   if (attachment.origin == AttachmentOrigin::Mock) {
     if (!mock_content.HasValue() || !temporary.WriteBytes(mock_content.ReadBytes())) {
       toast.Show(app::strings::attachment_export_failed);
@@ -208,7 +208,7 @@ View ReaderView(std::string thread_id, bool compact) {
   const DialogHandle dialog = UseDialog();
   const MenuHandle menu = UseMenu();
   const TaskScope reader_tasks = UseTaskScope();
-  const std::shared_ptr<FileSystem> files = UseService<FileSystem>();
+  const File temporary_directory = UseApplication().Directories().temporary_directory;
   const std::shared_ptr<FilePicker> picker = UseService<FilePicker>();
   const std::shared_ptr<MockMailService> service = UseService<MockMailService>();
   const auto entered = UseState(false);
@@ -399,7 +399,7 @@ View ReaderView(std::string thread_id, bool compact) {
                           attachment,
                           image_attachment ? mock_preview : mock_document,
                           reader_tasks,
-                          files,
+                          temporary_directory,
                           picker,
                           toast,
                           filter_name

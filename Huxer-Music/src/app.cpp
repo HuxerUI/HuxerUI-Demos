@@ -1273,7 +1273,7 @@ View MusicShell() {
       return;
     }
     transition.RunFromCurrentInteraction(
-        CircularRevealSceneTransition{.animation = TweenSpec{0.42, Easing::EaseInOut}},
+        TransitionSpec{CircularRevealTransition{}, TweenSpec{0.42, Easing::EaseInOut}},
         [=] {
           SelectTrack(music, index);
           liked = false;

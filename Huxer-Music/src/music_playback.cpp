@@ -73,7 +73,7 @@ MusicContext UseMusic() {
       .index = UseState(std::size_t{0}), .playing = UseState(false), .ready = UseState(false),
       .picking = UseState(false), .error = UseState(std::string{}), .tasks = UseTaskScope(), .picker = UseService<FilePicker>()};
   const std::vector<RawAsset> assets{UseRawResource(app::raw::good_to_go_mp3), UseRawResource(app::raw::on_brevity_mp3), UseRawResource(app::raw::dizzy_spells_mp3)};
-  const auto directory = UseService<FileSystem>()->Directories().data_directory.Child("bundled-audio");
+  const auto directory = UseApplication().Directories().data_directory.Child("bundled-audio");
   Lifecycle([=] {
     (void)music.tasks.Launch([=]() -> Task<void> {
       try {

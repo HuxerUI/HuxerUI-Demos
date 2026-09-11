@@ -276,7 +276,7 @@ static View AppContent(State<Experiment> experiment) {
     .formula_focused = UseState(false), .error = UseState(std::string{}),
     .status = UseState(StringVariant(app::strings::ready)), .selected_plot = UseState(0), .selected_curve = UseState(0), .selected_bin = UseState(8),
     .history = UseState(std::make_shared<History>()).Get(), .jobs = UseState(std::make_shared<Jobs>()).Get(),
-    .tasks = UseTaskScope(), .directories = UseService<FileSystem>()->Directories(), .picker = UseService<FilePicker>(),
+    .tasks = UseTaskScope(), .directories = UseApplication().Directories(), .picker = UseService<FilePicker>(),
     .dialogs = dialogs, .sheets = sheets};
   Lifecycle([=] {
     c.tasks.Launch([c]() -> Task<void> {

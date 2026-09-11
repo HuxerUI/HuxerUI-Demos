@@ -150,11 +150,11 @@ View DriveRoot() {
 
 [[huxerui::composable]]
 View App() {
-  const auto files = UseService<FileSystem>();
+  const auto application = UseApplication();
   const auto sample = UseRawResource(app::raw::coastal_study_png);
   const auto document = UseRawResource(app::raw::brand_guidelines_pdf);
   const auto archive = UseRawResource(app::raw::launch_assets_zip);
-  const auto store = UseState(std::make_shared<DriveStore>(files->Directories().data_directory.Child("drive"), sample, document, archive)).Get();
+  const auto store = UseState(std::make_shared<DriveStore>(application.Directories().data_directory.Child("drive"), sample, document, archive)).Get();
   const DriveContext context{
       .data = UseState(Snapshot{}), .ready = UseState(false), .busy = UseState(false), .error = UseState(Error::None),
       .area = UseState(Area::Files), .file_area = UseState(Area::Files), .path = UseState(NavigationPath<Route>{}), .search = UseState(TextEditingValue::FromText("")),
@@ -162,7 +162,6 @@ View App() {
       .grid = UseState(false), .dark = UseState(false), .selected = UseState(std::vector<Id>{}),
       .transfers = UseState(std::vector<Transfer>{}), .transfer_panel = UseState(false), .conflict = UseState(Conflict::KeepBoth),
       .tasks = UseTaskScope(), .store = store, .picker = UseService<FilePicker>(), .dialogs = UseDialog()};
-  const auto application = UseApplication();
   const auto startup = application.StartupActivation();
   Lifecycle([=] { Run(context, [=] { return store->Load(); }, [=] {
     context.ready = true;
