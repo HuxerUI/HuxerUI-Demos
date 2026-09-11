@@ -1,10 +1,10 @@
 # HuxerUI Demos
 
-Complete applications built with HuxerUI, from a three-column mail workspace to a touch-first personal drive and an immersive music player.
+Complete applications built with HuxerUI: an immersive music player, an interactive function and signal laboratory, a three-column mail workspace, and a touch-first personal drive.
 
 Each demo has its own visual identity, responsive navigation, and working user flows. Explore the interfaces below, then open a project to build and run it with the public HuxerUI SDK.
 
-[Music](#huxer-music) · [Mail](#huxer-mail) · [Drive](#huxer-drive) · [Quick start](#quick-start) · [Platforms](#platforms)
+[Music](#huxer-music) · [Graph](#huxer-graph) · [Mail](#huxer-mail) · [Drive](#huxer-drive) · [Quick start](#quick-start) · [Platforms](#platforms)
 
 ## Huxer Music
 
@@ -19,6 +19,20 @@ Play three bundled English songs, seek through a track, adjust volume, and open 
 Playback uses [HuxerUI/Lib-MediaPlayer](https://github.com/HuxerUI/Lib-MediaPlayer). Lyrics labeled **DEMO** are illustrative text synchronized to playback position, not the recordings' actual lyrics. Bundled songs are by Josh Woodward under CC BY 4.0; see [attribution and licenses](Huxer-Music/THIRD_PARTY_NOTICES.md).
 
 [Explore Huxer Music →](Huxer-Music/README.md)
+
+## Huxer Graph
+
+**An interactive function editor and Fourier laboratory with real numerical calculations.**
+
+![Huxer Graph on Windows: three editable functions and shared parameters alongside an interactive coordinate plane](docs/screenshots/huxer-graph-desktop.png)
+
+*Windows · Function editing with shared parameters · Material light theme*
+
+Edit explicit, parametric, and polar functions, adjust shared parameters, pan and zoom the coordinate plane, and trace points on a curve. Switch to Signals to synthesize waveforms, inspect their FFT spectrum, edit frequency components, and reconstruct the waveform with an inverse transform.
+
+Calculations run locally. Experiments support undo/redo, autosave, project files, and SVG/CSV export; no account or server is required.
+
+[Explore Huxer Graph →](Huxer-Graph/README.md)
 
 ## Huxer Mail
 
@@ -63,7 +77,7 @@ huxerui doctor all
 huxerui run windows --profile debug
 ```
 
-Replace `Huxer-Mail` with `Huxer-Drive` or `Huxer-Music`. To run on a connected Android device:
+Replace `Huxer-Mail` with `Huxer-Music`, `Huxer-Graph`, or `Huxer-Drive`. To run on a connected Android device:
 
 ```sh
 huxerui devices android
@@ -81,6 +95,7 @@ The table lists platform host projects included in this repository. It is not a 
 | Demo | Windows | Linux | macOS | Android | iOS | Web |
 | --- | :---: | :---: | :---: | :---: | :---: | :---: |
 | [Music](Huxer-Music/README.md) | ✓ | ✓ | ✓ | ✓ | — | — |
+| [Graph](Huxer-Graph/README.md) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | [Mail](Huxer-Mail/README.md) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | [Drive](Huxer-Drive/README.md) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 

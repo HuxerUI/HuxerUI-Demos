@@ -1,15 +1,16 @@
 # Screenshot notes
 
-These screenshots were captured from running demos on September 11, 2026. The desktop PNGs were supplied by the project maintainer and capture the Windows application windows without a mouse pointer. The Android images are full device screenshots. The gallery uses the original captures without mock device frames or composited UI.
+These screenshots were captured from running demos on September 11, 2026. The Music and Mail desktop PNGs were supplied by the project maintainer; Graph was captured directly from its Windows application window. Desktop captures exclude the mouse pointer. The Android images are full device screenshots. The gallery uses the original captures without mock device frames or composited UI.
 
 | Image | Platform | Scene |
 | --- | --- | --- |
 | [Huxer Music](huxer-music-desktop.png) | Windows | For You, bundled "Good to Go" loaded and paused at 0:00, record artwork and illustrative DEMO lyrics |
+| [Huxer Graph](huxer-graph-desktop.png) | Windows | Material light theme, Functions workspace, three curves and shared parameters |
 | [Huxer Mail](huxer-mail-desktop.png) | Windows | Light theme, Inbox, no conversation selected |
 | [Huxer Drive](huxer-drive-android.png) | Android | Light theme, Files → Recent, grid view with sample images and documents |
 | [Huxer Drive preview](huxer-drive-preview-android.png) | Android | Light theme, "Morning light.png" image preview with Share, Download, and Details actions |
 
-All screenshots use English interface text and sample content. Mail and Drive were captured with a temporary `en-US` locale override, then their source code and normal builds were restored. Screenshots show representative desktop and mobile layouts; see the [platform table](../../README.md#platforms) for included host projects.
+All screenshots use English interface text and sample content. Graph, Mail, and Drive were captured with a temporary `en-US` locale override, then their source code and normal builds were restored. Screenshots show representative desktop and mobile layouts; see the [platform table](../../README.md#platforms) for included host projects.
 
 ## Refreshing the gallery
 

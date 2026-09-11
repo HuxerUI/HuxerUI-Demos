@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Huxer Graph
+Exec=huxer_graph
+Icon=huxer_graph
+Categories=Utility;
+Terminal=false

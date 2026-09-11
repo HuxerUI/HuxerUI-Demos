@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(graph_tests LANGUAGES C CXX)
+include(../cmake/Dependencies.cmake)
+add_executable(graph_tests math_tests.cpp)
+target_link_libraries(graph_tests PRIVATE graph_core)
+enable_testing()
+add_test(NAME graph_math_and_documents COMMAND graph_tests)
