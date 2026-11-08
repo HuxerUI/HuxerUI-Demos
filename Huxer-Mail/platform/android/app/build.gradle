@@ -74,6 +74,8 @@ android {
 
     buildTypes {
         release {
+            // Replace the local development signing configuration before publishing.
+            signingConfig = signingConfigs.debug
             minifyEnabled = false
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
