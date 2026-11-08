@@ -16,7 +16,7 @@ Each demo has its own visual identity, responsive navigation, and working user f
 
 Play three bundled English songs, seek through a track, adjust volume, and open local audio from the library. Animated artwork and lyrics share the desktop stage; Android offers swipeable Now Playing and Library pages.
 
-Playback uses [HuxerUI/Lib-MediaPlayer](https://github.com/HuxerUI/Lib-MediaPlayer). Lyrics labeled **DEMO** are illustrative text synchronized to playback position, not the recordings' actual lyrics. Bundled songs are by Josh Woodward under CC BY 4.0; see [attribution and licenses](Huxer-Music/THIRD_PARTY_NOTICES.md).
+Playback uses [HuxerUI/Lib-Media](https://github.com/HuxerUI/Lib-Media). Lyrics labeled **DEMO** are illustrative text synchronized to playback position, not the recordings' actual lyrics. Bundled songs are by Josh Woodward under CC BY 4.0; see [attribution and licenses](Huxer-Music/THIRD_PARTY_NOTICES.md).
 
 [Explore Huxer Music →](Huxer-Music/README.md)
 
@@ -67,7 +67,7 @@ Import, export, and app-owned storage are real and persist across restarts. Clou
 
 ## Quick start
 
-Install the HuxerUI SDK and the target platform toolchain. Set `HUXERUI_HOME` to the SDK root and add its `bin` directory to `PATH`.
+These projects target HuxerUI SDK 0.4.0. Install the SDK and the target platform toolchain. Set `HUXERUI_HOME` to the SDK root and add its `bin` directory to `PATH`.
 
 Run commands from the demo you want to explore:
 

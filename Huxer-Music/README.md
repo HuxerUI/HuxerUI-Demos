@@ -1,7 +1,7 @@
 # Huxer Music
 
 Huxer Music is a HuxerUI music player demo with real audio playback through
-[HuxerUI/Lib-MediaPlayer](https://github.com/HuxerUI/Lib-MediaPlayer).
+[HuxerUI/Lib-Media](https://github.com/HuxerUI/Lib-Media).
 It includes three offline English songs by Josh Woodward: Good to Go, On Brevity,
 and Dizzy Spells. See [music attribution and licenses](THIRD_PARTY_NOTICES.md).
 

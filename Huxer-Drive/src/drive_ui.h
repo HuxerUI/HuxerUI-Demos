@@ -6,6 +6,11 @@
 namespace huxer_drive {
 using namespace huxerui;
 
+struct DriveActivations {
+  std::vector<FileReference> files;
+  State<int> revision{0};
+};
+
 struct Route {
   Id id = 0;
   bool preview = false;

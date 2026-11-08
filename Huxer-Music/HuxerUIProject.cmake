@@ -19,10 +19,6 @@ if (HUXERUI_PROJECT_PLAN_ONLY)
     return()
 endif ()
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum macOS deployment target" FORCE)
-endif ()
-
 if (NOT HUXERUI_LIBRARY_GRAPH_ONLY)
     enable_language(CXX)
     if (WIN32)
@@ -30,8 +26,8 @@ if (NOT HUXERUI_LIBRARY_GRAPH_ONLY)
     endif ()
 endif ()
 
-if (NOT TARGET HuxerUI::huxerui)
-    set(HUXERUI_HOME "$ENV{HUXERUI_HOME}" CACHE PATH "HuxerUI SDK or source directory")
+if (NOT TARGET HuxerUI::huxerui AND NOT TARGET HuxerUI::huxerui_static)
+    set(HUXERUI_HOME "$ENV{HUXERUI_HOME}" CACHE PATH "HuxerUI framework directory")
     if (HUXERUI_HOME AND EXISTS "${HUXERUI_HOME}/CMakeLists.txt"
             AND EXISTS "${HUXERUI_HOME}/include/huxerui/huxerui.h")
         set(HUXERUI_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -55,19 +51,17 @@ if (NOT TARGET HuxerUI::huxerui)
     endif ()
 endif ()
 
-if (WIN32)
-    include("${CMAKE_CURRENT_SOURCE_DIR}/platform/windows/huxerui.cmake" OPTIONAL)
-elseif (APPLE AND NOT IOS)
-    include("${CMAKE_CURRENT_SOURCE_DIR}/platform/macos/huxerui.cmake" OPTIONAL)
-elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    include("${CMAKE_CURRENT_SOURCE_DIR}/platform/linux/huxerui.cmake" OPTIONAL)
-elseif (EMSCRIPTEN)
-    include("${CMAKE_CURRENT_SOURCE_DIR}/platform/web/huxerui.cmake" OPTIONAL)
+if (NOT HUXERUI_LIBRARY_GRAPH_ONLY)
+    if (WIN32)
+        include("${CMAKE_CURRENT_SOURCE_DIR}/platform/windows/huxerui.cmake" OPTIONAL)
+    elseif (APPLE AND NOT IOS)
+        include("${CMAKE_CURRENT_SOURCE_DIR}/platform/macos/huxerui.cmake" OPTIONAL)
+    elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        include("${CMAKE_CURRENT_SOURCE_DIR}/platform/linux/huxerui.cmake" OPTIONAL)
+    elseif (EMSCRIPTEN)
+        include("${CMAKE_CURRENT_SOURCE_DIR}/platform/web/huxerui.cmake" OPTIONAL)
+    endif ()
 endif ()
-
-set(HUXERUI_LIBRARY_GRAPH_OUTPUT
-        "${CMAKE_CURRENT_SOURCE_DIR}/.huxerui/generated/libraries.json"
-)
 
 set(HUXERUI_APP_RESOURCE_OUTPUT_ARGUMENTS)
 if (ANDROID AND HUXERUI_ANDROID_RESOURCE_OUTPUT_ROOT)
@@ -80,6 +74,9 @@ endif ()
 function(huxerui_configure_project_app target_name)
     if (NOT TARGET ${target_name})
         message(FATAL_ERROR "huxerui_configure_project_app() target does not exist: ${target_name}")
+    endif ()
+    if (HUXERUI_LIBRARY_GRAPH_ONLY)
+        return()
     endif ()
 
     get_target_property(HUXERUI_PROJECT_APP_INSTALL_COMPONENT
@@ -106,6 +103,8 @@ function(huxerui_configure_project_app target_name)
     if (APPLE AND NOT IOS AND HUXERUI_MACOS_INFO_PLIST)
         set_target_properties(${target_name} PROPERTIES
                 MACOSX_BUNDLE_INFO_PLIST "${HUXERUI_MACOS_INFO_PLIST}"
+                MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+                MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
         )
     endif ()
     if (APPLE AND NOT IOS AND COMMAND huxerui_configure_macos_project_package)

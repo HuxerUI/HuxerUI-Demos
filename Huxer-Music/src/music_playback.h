@@ -1,7 +1,7 @@
 #pragma once
 
 #include <huxerui/huxerui.h>
-#include <huxerui/mediaplayer.h>
+#include <huxerui/media_player.h>
 #include <memory>
 #include <string>
 #include <string_view>

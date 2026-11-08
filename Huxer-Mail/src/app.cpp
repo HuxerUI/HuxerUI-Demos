@@ -29,8 +29,8 @@ AppOptions BuildOptions() {
   }
   options.viewport_breakpoints = {.medium_width = 720.0F, .expanded_width = 1120.0F};
   options.show_debug_overlay = false;
-  options.root_hooks.push_back([](RootContext& root) {
-    root.Provide(std::make_shared<huxer_mail::MockMailService>());
+  options.application_hooks.push_back([](ApplicationContext& context) {
+    context.Provide(std::make_shared<huxer_mail::MockMailService>());
   });
   return options;
 }

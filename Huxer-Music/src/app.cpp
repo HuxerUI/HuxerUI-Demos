@@ -1374,7 +1374,7 @@ AppOptions BuildOptions() {
       .toggle_maximize = app::strings::window_toggle_maximize,
       .close = app::strings::window_close,
   };
-  options.root_hooks = {huxerui::media::Install};
+  options.application_hooks = {huxerui::media::Install};
   options.show_debug_overlay = false;
   return options;
 }

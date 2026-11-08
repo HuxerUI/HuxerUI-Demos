@@ -17,11 +17,11 @@ Audio opened from a user's device is not part of this distribution.
 
 # Playback library
 
-[HuxerUI/Lib-MediaPlayer](https://github.com/HuxerUI/Lib-MediaPlayer) is acquired by
-`huxerui_use_library`, pinned to commit `4243f48f19b5314236c62cb9f5db39daf6865bf3`.
+[HuxerUI/Lib-Media](https://github.com/HuxerUI/Lib-Media) is acquired by
+`huxerui_use_library`, pinned to commit `59f0867be9f6e437edac2402a57430c043a4c893`.
 Its repository contains its own license and platform dependency notices.
 
-## Lib-MediaPlayer license
+## Lib-Media license
 
 MIT License
 

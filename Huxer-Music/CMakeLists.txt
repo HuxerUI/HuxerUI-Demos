@@ -1,5 +1,13 @@
 cmake_minimum_required(VERSION 3.20)
 
+# CMake initializes Apple deployment defaults during the first project() call.
+# Explicit settings and toolchains retain ownership of their target platform.
+if (CMAKE_HOST_APPLE AND (NOT CMAKE_SYSTEM_NAME OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        AND NOT CMAKE_TOOLCHAIN_FILE AND "$ENV{CMAKE_TOOLCHAIN_FILE}" STREQUAL ""
+        AND NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET AND "$ENV{MACOSX_DEPLOYMENT_TARGET}" STREQUAL "")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "Minimum macOS deployment target")
+endif ()
+
 project(huxer_music VERSION 0.1.0 LANGUAGES NONE)
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/HuxerUIProject.cmake")
@@ -46,9 +54,9 @@ string(SHA256 MUSIC_BUILD_ID "${CMAKE_CURRENT_BINARY_DIR}")
 string(SUBSTRING "${MUSIC_BUILD_ID}" 0 8 MUSIC_BUILD_ID)
 set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.huxerui/${MUSIC_BUILD_ID}")
 huxerui_use_library(huxer_music
-        TARGET HuxerUI::MediaPlayer
-        URL "https://github.com/HuxerUI/Lib-MediaPlayer.git"
-        COMMIT "4243f48f19b5314236c62cb9f5db39daf6865bf3"
+        TARGET HuxerUI::Media
+        URL "https://github.com/HuxerUI/Lib-Media.git"
+        COMMIT "59f0867be9f6e437edac2402a57430c043a4c893"
 )
 
 huxerui_configure_project_app(huxer_music)

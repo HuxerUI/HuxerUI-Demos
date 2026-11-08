@@ -72,7 +72,7 @@ View HuxerMailApp() {
     });
   });
 
-  UseApplication().OnLifecycleChange([lifecycle = status.lifecycle,
+  UseApplication().OnLifecycleChanged([lifecycle = status.lifecycle,
                                       clock = status.clock_revision](ApplicationLifecycleState value) {
     lifecycle = value;
     if (value == ApplicationLifecycleState::Active) {

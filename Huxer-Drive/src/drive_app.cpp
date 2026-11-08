@@ -163,13 +163,19 @@ View App() {
       .transfers = UseState(std::vector<Transfer>{}), .transfer_panel = UseState(false), .conflict = UseState(Conflict::KeepBoth),
       .tasks = UseTaskScope(), .store = store, .picker = UseService<FilePicker>(), .dialogs = UseDialog()};
   const auto startup = application.StartupActivation();
+  const auto activations = UseService<DriveActivations>();
   Lifecycle([=] { Run(context, [=] { return store->Load(); }, [=] {
     context.ready = true;
-    if (const auto* payload = std::get_if<FileActivation>(&startup)) ImportFiles(context, payload->files, 0);
+    if (startup) {
+      if (const auto* payload = std::get_if<FileActivation>(&*startup)) ImportFiles(context, payload->files, 0);
+    }
   }); });
-  application.OnActivation([=](ApplicationActivation activation) {
-    if (const auto* payload = std::get_if<FileActivation>(&activation)) if (context.ready.Get()) ImportFiles(context, payload->files, 0);
-  });
+  Lifecycle([=] {
+    if (!context.ready.Get() || activations->files.empty()) return;
+    auto files = std::move(activations->files);
+    activations->files.clear();
+    ImportFiles(context, std::move(files), 0);
+  }, context.ready, activations->revision);
   Environment environment; environment.Set(context);
   return Theme(DriveTheme(context.dark.Get(), UseViewportClass() == ViewportClass::Compact), ProvideEnvironment(std::move(environment), DriveRoot()));
 }
